@@ -1,40 +1,53 @@
-FROM jlesage/baseimage-gui:ubuntu-24.04-v4 AS build
+FROM ubuntu:22.04
+#FROM jlesage/baseimage-gui:ubuntu-24.04-v4 AS build
 
-MAINTAINER Randy Heiland, randy.heiland@gmail.com
+# MAINTAINER Randy Heiland, randy.heiland@gmail.com
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# This fix: libGL error: No matching fbConfigs or visuals found
+ENV LIBGL_ALWAYS_INDIRECT=1
+
+ENV DISPLAY=:0
 
 RUN apt-get update -y && \
-     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
          ca-certificates \
          wget \
          libgl1 \
          xz-utils \
          openjfx \
          nano \
-         qt5dxcb-plugin && \
-     rm -rf /var/lib/apt/lists/*
+         qt5dxcb-plugin \
+         python3-pyqt5 python3-pyqt5.qtsvg python3-pip
+#     rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /opt/pcstudio &&\
-    chmod 777 /opt/pcstudio &&\
-    cd /opt/pcstudio/ && \
-    wget https://github.com/pcstudio/pcstudio/releases/download/v0.5.1/pcstudio-v0.5.1-Linux.tar.xz &&\
-    tar -xvf pcstudio-v0.5.1-Linux.tar.xz && \
-    mv /opt/pcstudio/pcstudio-v0.5.1-Linux/* /opt/pcstudio/ && \
-    rm /opt/pcstudio/pcstudio-v0.5.1-Linux.tar.xz /opt/pcstudio/pcstudio-v0.5.1-Linux/ -rf && \
-    chmod u+x /opt/pcstudio/pcstudio/bin/pcstudio
+RUN pip install numpy matplotlib scipy pandas
+
+
+RUN mkdir -p /opt/pcstudio/bin/images &&\
+    mkdir -p /opt/pcstudio/bin/icon &&\
+    mkdir -p /opt/pcstudio/config &&\
+    chmod -R 777 /opt/pcstudio 
 
 # Generate and install favicons.
-RUN APP_ICON_URL=https://github.com/pcstudio/pcstudio/wiki/images/pcstudio_128.png && \
-    install_app_icon.sh "$APP_ICON_URL"
+# RUN APP_ICON_URL=https://github.com/pcstudio/pcstudio/wiki/images/pcstudio_131.png && \
+#     install_app_icon.sh "$APP_ICON_URL"
 
-COPY startapp.sh /startapp.sh
-RUN chmod +x /startapp.sh
+# COPY startapp.sh /startapp.sh
+# RUN chmod +x /startapp.sh
+
+COPY ./bin/* /opt/pcstudio/bin/
+COPY ./bin/images/* /opt/pcstudio/bin/images/
+COPY ./bin/icon/* /opt/pcstudio/bin/icon/
+COPY ./config/* /opt/pcstudio/config/
 
 # Installing a few extensions
-RUN cd /opt/pcstudio/pcstudio/lib/app/ && \
-    wget https://github.com/pcstudio/pcstudio-extension-djl/releases/download/v0.3.0/pcstudio-extension-djl-0.3.0.jar &&\
-    wget https://github.com/pcstudio/pcstudio-extension-stardist/releases/download/v0.5.0/pcstudio-extension-stardist-0.5.0.jar &&\
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/pcstudio-extension-djl-0.3.0.jar' pcstudio.cfg  && \
-    sed -i '/^\[Application\]$/a app.classpath=$APPDIR/pcstudio-extension-stardist-0.5.0.jar' pcstudio.cfg
+# RUN cd /opt/pcstudio/pcstudio/lib/app/ && \
+#     wget https://github.com/pcstudio/pcstudio-extension-djl/releases/download/v0.3.0/pcstudio-extension-djl-0.3.0.jar &&\
+#     wget https://github.com/pcstudio/pcstudio-extension-stardist/releases/download/v0.5.0/pcstudio-extension-stardist-0.5.0.jar &&\
+#     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/pcstudio-extension-djl-0.3.0.jar' pcstudio.cfg  && \
+#     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/pcstudio-extension-stardist-0.5.0.jar' pcstudio.cfg
 
 # Set the name of the application.
 ENV APP_NAME="pcstudio"
