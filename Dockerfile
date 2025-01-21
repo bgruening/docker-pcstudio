@@ -1,5 +1,5 @@
-FROM ubuntu:22.04
-#FROM jlesage/baseimage-gui:ubuntu-24.04-v4 AS build
+# FROM ubuntu:22.04
+FROM jlesage/baseimage-gui:ubuntu-24.04-v4 AS build
 
 # MAINTAINER Randy Heiland, randy.heiland@gmail.com
 
