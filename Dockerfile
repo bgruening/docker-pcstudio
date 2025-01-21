@@ -19,10 +19,13 @@ RUN apt-get update -y && \
          openjfx \
          nano \
          qt5dxcb-plugin \
-         python3-pyqt5 python3-pyqt5.qtsvg python3-pip
+         python3-full python3-pyqt5 python3-pyqt5.qtsvg python3-pip
 #     rm -rf /var/lib/apt/lists/*
 
-RUN pip install numpy matplotlib scipy pandas
+#RUN pip install numpy matplotlib scipy pandas
+RUN python3 -m venv /tmp/my-venv
+RUN ls /tmp/my-venv
+RUN /tmp/my-venv/bin/pip install numpy matplotlib scipy pandas
 
 
 RUN mkdir -p /opt/pcstudio/bin/images &&\
