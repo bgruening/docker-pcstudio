@@ -6,7 +6,7 @@
 
 ```bash
 docker build -t docker-pcstudio .
-docker run -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix docker-pcstudio python3 /opt/pcstudio/bin/studio.py -c /opt/pcstudio/config/PhysiCell_settings.xml
+docker run -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix docker-pcstudio /usr/local/pcstudio-venv/bin/python3 /opt/pcstudio/bin/studio.py -c /opt/pcstudio/config/PhysiCell_settings.xml
 ```
 
 ### Galaxy integration
