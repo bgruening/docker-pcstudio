@@ -19,6 +19,7 @@ RUN apt-get update -y && \
          openjfx \
          nano \
          qt5dxcb-plugin \
+         qtbase5-dev \
          python3-full python3-pyqt5 python3-pyqt5.qtsvg python3-pip
 #     rm -rf /var/lib/apt/lists/*
 
@@ -29,7 +30,8 @@ RUN apt-get update -y && \
 # RUN /tmp/my-venv/bin/pip install numpy matplotlib scipy pandas
 RUN python3 -m venv /usr/local/pcstudio-venv
 #RUN /usr/local/pcstudio-venv/bin/pip install numpy matplotlib scipy pandas
-RUN /usr/local/pcstudio-venv/bin/pip install PyQt5 matplotlib scipy pandas
+#RUN /usr/local/pcstudio-venv/bin/pip install PyQt5 matplotlib scipy pandas
+RUN /usr/local/pcstudio-venv/bin/pip install --no-cache-dir PyQt5 matplotlib scipy pandas
 
 
 RUN mkdir -p /opt/pcstudio/bin/images &&\
