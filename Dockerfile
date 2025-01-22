@@ -22,10 +22,14 @@ RUN apt-get update -y && \
          python3-full python3-pyqt5 python3-pyqt5.qtsvg python3-pip
 #     rm -rf /var/lib/apt/lists/*
 
-#RUN pip install numpy matplotlib scipy pandas
-RUN python3 -m venv /tmp/my-venv
-RUN ls /tmp/my-venv
-RUN /tmp/my-venv/bin/pip install numpy matplotlib scipy pandas
+# RUN pip install numpy matplotlib scipy pandas
+# RUN python3 -m pip install numpy matplotlib scipy pandas
+# RUN python3 -m venv /tmp/my-venv
+# RUN ls /tmp/my-venv
+# RUN /tmp/my-venv/bin/pip install numpy matplotlib scipy pandas
+RUN python3 -m venv /usr/local/pcstudio-venv
+#RUN /usr/local/pcstudio-venv/bin/pip install numpy matplotlib scipy pandas
+RUN /usr/local/pcstudio-venv/bin/pip install PyQt5 matplotlib scipy pandas
 
 
 RUN mkdir -p /opt/pcstudio/bin/images &&\
