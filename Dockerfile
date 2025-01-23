@@ -2,6 +2,21 @@ FROM jlesage/baseimage-gui:ubuntu-24.04-v4 AS build
 
 # MAINTAINER Randy Heiland, randy.heiland@gmail.com
 
+# Build a Docker image for PhysiCell Studio (to become an "Interactive tool" for Galaxy)
+#   https://github.com/PhysiCell-Tools/PhysiCell-Studio
+#   PhysiCell Studio currently uses PyQt5 for its GUI and we would like to retain
+#   that for the Galaxy tool, at least for now.
+#
+# References:
+#   https://github.com/usegalaxy-eu/docker-qupath
+#   https://github.com/jlesage/docker-baseimage-gui
+
+
+# Experimented with this env var, but it seems to make no difference. When we try to run
+# the tool in a local Galaxy server, we get: 
+# File "/usr/local/pcstudio-venv/lib/python3.12/site-packages/matplotlib/pyplot.py", line 433, in switch_backend
+#   raise ImportError(
+#   ImportError: Cannot load backend 'Qt5Agg' which requires the 'qt' interactive framework, as 'headless' is currently running)
 # ENV DEBIAN_FRONTEND=noninteractive
 
 # This fix: libGL error: No matching fbConfigs or visuals found
@@ -51,7 +66,7 @@ COPY ./config/* /opt/pcstudio/config/
 # rwh: where/how is this used?
 ENV APP_NAME="pcstudio"
 
-# rwh: no idea what the following do
+# rwh: what do the following do?
 ENV KEEP_APP_RUNNING=0
 
 ENV TAKE_CONFIG_OWNERSHIP=1
