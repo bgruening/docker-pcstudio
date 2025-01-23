@@ -22,6 +22,7 @@ FROM jlesage/baseimage-gui:ubuntu-24.04-v4 AS build
 # This fix: libGL error: No matching fbConfigs or visuals found
 ENV LIBGL_ALWAYS_INDIRECT=1
 
+# some of these pkgs may not be necessary, e.g., openjfx, but leaving in for now
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
          ca-certificates \
