@@ -1,14 +1,11 @@
-# FROM ubuntu:22.04
 FROM jlesage/baseimage-gui:ubuntu-24.04-v4 AS build
 
 # MAINTAINER Randy Heiland, randy.heiland@gmail.com
 
-ENV DEBIAN_FRONTEND=noninteractive
+# ENV DEBIAN_FRONTEND=noninteractive
 
 # This fix: libGL error: No matching fbConfigs or visuals found
 ENV LIBGL_ALWAYS_INDIRECT=1
-
-ENV DISPLAY=:0
 
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
@@ -23,16 +20,8 @@ RUN apt-get update -y && \
          python3-full python3-pyqt5 python3-pyqt5.qtsvg python3-pip
 #     rm -rf /var/lib/apt/lists/*
 
-# RUN pip install numpy matplotlib scipy pandas
-# RUN python3 -m pip install numpy matplotlib scipy pandas
-# RUN python3 -m venv /tmp/my-venv
-# RUN ls /tmp/my-venv
-# RUN /tmp/my-venv/bin/pip install numpy matplotlib scipy pandas
 RUN python3 -m venv /usr/local/pcstudio-venv
-#RUN /usr/local/pcstudio-venv/bin/pip install numpy matplotlib scipy pandas
-#RUN /usr/local/pcstudio-venv/bin/pip install PyQt5 matplotlib scipy pandas
-RUN /usr/local/pcstudio-venv/bin/pip install --no-cache-dir PyQt5 matplotlib scipy pandas
-
+RUN /usr/local/pcstudio-venv/bin/pip install matplotlib scipy pandas PyQt5
 
 RUN mkdir -p /opt/pcstudio/bin/images &&\
     mkdir -p /opt/pcstudio/bin/icon &&\
@@ -59,8 +48,10 @@ COPY ./config/* /opt/pcstudio/config/
 #     sed -i '/^\[Application\]$/a app.classpath=$APPDIR/pcstudio-extension-stardist-0.5.0.jar' pcstudio.cfg
 
 # Set the name of the application.
+# rwh: where/how is this used?
 ENV APP_NAME="pcstudio"
 
+# rwh: no idea what the following do
 ENV KEEP_APP_RUNNING=0
 
 ENV TAKE_CONFIG_OWNERSHIP=1

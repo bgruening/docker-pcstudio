@@ -1,0 +1,37 @@
+<tool id="interactive_tool_physicell_studio" tool_type="interactive" name="PhysiCell Studio" version="0.1" profile="22.01">
+    <requirements>
+        <container type="docker">heiland/ubu-studio:latest</container>
+    </requirements>
+    <entry_points>
+        <entry_point name="PhysiCell Studio" requires_domain="False">
+            <port>8080</port>
+            <url>http://127.0.0.1/</url>
+        </entry_point>
+    </entry_points>
+    <environment_variables>
+        <environment_variable name="HISTORY_ID">$__history_id__</environment_variable>
+        <environment_variable name="GALAXY_WEB_PORT">8080</environment_variable>
+        <environment_variable name="GALAXY_URL">$__galaxy_url__</environment_variable>
+        <environment_variable name="DEBUG">true</environment_variable>
+        <environment_variable name="DISABLE_AUTH">true</environment_variable>
+    </environment_variables>
+    <command><![CDATA[
+        export GALAXY_WORKING_DIR=`pwd` &&
+        /usr/local/pcstudio-venv/bin/python3 /opt/pcstudio/bin/studio.py -c /opt/pcstudio/config/PhysiCell_settings.xml
+    ]]>
+    </command>
+    <inputs>
+    </inputs>
+    <outputs>
+       <data name="outfile" format="txt" /> 
+    </outputs>
+    <tests>
+    </tests>
+    <help>
+    PhysiCell Studio is an open-source web application that lets you create an agent-based, multicellular model. 
+
+    Galaxy lets you run PhysiCell Studio directly...
+
+    You can import data via a predefined `get()` function and write results back to Galaxy with a `put()` function.
+    </help>
+</tool>

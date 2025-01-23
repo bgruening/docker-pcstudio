@@ -1,0 +1,13 @@
+runners:
+  local:
+    load: galaxy.jobs.runners.local:LocalJobRunner
+    workers: 4
+
+execution:
+  default: local
+  environments:
+    local:
+      runner: local
+      docker_enabled: true
+      docker_volumes: $defaults,/tmp/.X11-unix:/tmp/.X11-unix
+      docker_run_extra_arguments: -e DISPLAY=$DISPLAY
