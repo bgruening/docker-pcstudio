@@ -1585,7 +1585,7 @@ if __name__ == '__main__':
     # logging.basicConfig(filename='studio.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
     # logging.basicConfig(filename="studio_debug.log", level=logging.INFO)
     logfile = "studio_debug.log"
-    # logging.basicConfig(filename=logfile, level=logging.DEBUG, filemode='w',)
+    # logging.basicConfig(filename=logfile, level=logging.DEBUG, filemode='w',)  #rwh: comment out for Docker?
     # logging.basicConfig(filename=logfile, level=logging.ERROR, filemode='w',)
 
     # # trying/failing to change name on icon in Mac Dock from "pythonx.y" to something else (including .xml name)
