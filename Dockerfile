@@ -48,8 +48,8 @@ RUN mkdir -p /opt/pcstudio/bin/images &&\
 # RUN APP_ICON_URL=https://github.com/pcstudio/pcstudio/wiki/images/pcstudio_131.png && \
 #     install_app_icon.sh "$APP_ICON_URL"
 
-# COPY startapp.sh /startapp.sh
-# RUN chmod +x /startapp.sh
+COPY startapp.sh /startapp.sh
+RUN chmod +x /startapp.sh
 
 COPY ./bin/* /opt/pcstudio/bin/
 COPY ./bin/images/* /opt/pcstudio/bin/images/
