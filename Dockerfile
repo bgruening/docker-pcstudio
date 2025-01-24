@@ -23,17 +23,18 @@ FROM jlesage/baseimage-gui:ubuntu-24.04-v4 AS build
 ENV LIBGL_ALWAYS_INDIRECT=1
 
 # some of these pkgs may not be necessary, e.g., openjfx, but leaving in for now
+        #  openjfx \
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
          ca-certificates \
          wget \
          libgl1 \
          xz-utils \
-         openjfx \
          nano \
          qt5dxcb-plugin \
          qtbase5-dev \
-         python3-full python3-pyqt5 python3-pyqt5.qtsvg python3-pip
+         python3-full python3-pyqt5 python3-pyqt5.qtsvg python3-pip \
+         g++ libomp-dev
 #     rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m venv /usr/local/pcstudio-venv
@@ -55,6 +56,8 @@ COPY ./bin/* /opt/pcstudio/bin/
 COPY ./bin/images/* /opt/pcstudio/bin/images/
 COPY ./bin/icon/* /opt/pcstudio/bin/icon/
 COPY ./config/* /opt/pcstudio/config/
+COPY ./project /opt/pcstudio/
+RUN chmod -R 777 /opt/pcstudio
 
 # Installing a few extensions
 # RUN cd /opt/pcstudio/pcstudio/lib/app/ && \
