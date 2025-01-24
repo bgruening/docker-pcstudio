@@ -1,6 +1,6 @@
 <tool id="interactive_tool_physicell_studio" tool_type="interactive" name="PhysiCell Studio" version="0.1" profile="22.01">
     <requirements>
-        <container type="docker">heiland/ubu-studio:latest</container>
+        <container type="docker">heiland/galaxy-physicell-studio:latest</container>
     </requirements>
     <entry_points>
         <entry_point name="PhysiCell Studio" requires_domain="False">
