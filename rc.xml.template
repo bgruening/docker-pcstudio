@@ -525,8 +525,8 @@
 
   <!-- Main window should be maximized and without decoration. -->
   
-  <!-- title="QuPath" matches the main window -->
-  <application title="QuPath">
+  <!-- title="PhysiCell Studio" matches the main window -->
+  <application title="PhysiCell Studio">
     <decor>yes</decor>
     <maximized>yes</maximized>
     <fullscreen>yes</fullscreen>

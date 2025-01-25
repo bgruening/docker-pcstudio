@@ -11,7 +11,6 @@ FROM jlesage/baseimage-gui:ubuntu-24.04-v4 AS build
 #   https://github.com/usegalaxy-eu/docker-qupath
 #   https://github.com/jlesage/docker-baseimage-gui
 
-
 # Experimented with this env var, but it seems to make no difference. When we try to run
 # the tool in a local Galaxy server, we get: 
 # File "/usr/local/pcstudio-venv/lib/python3.12/site-packages/matplotlib/pyplot.py", line 433, in switch_backend
@@ -28,14 +27,15 @@ RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
          ca-certificates \
          wget \
+         zip \
          libgl1 \
          xz-utils \
          nano \
          qt5dxcb-plugin \
          qtbase5-dev \
          python3-full python3-pyqt5 python3-pyqt5.qtsvg python3-pip \
-         g++ libomp-dev
-#     rm -rf /var/lib/apt/lists/*
+         g++ libomp-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m venv /usr/local/pcstudio-venv
 RUN /usr/local/pcstudio-venv/bin/pip install matplotlib scipy pandas PyQt5
@@ -72,7 +72,6 @@ ENV APP_NAME="pcstudio"
 
 # rwh: what do the following do?
 ENV KEEP_APP_RUNNING=0
-
 ENV TAKE_CONFIG_OWNERSHIP=1
 
 COPY rc.xml.template /opt/base/etc/openbox/rc.xml.template
