@@ -524,9 +524,13 @@
 -->
 
   <!-- Main window should be maximized and without decoration. -->
+
+  <!-- Do  figure out the window titles, classes etc start your containers with a shell.
+  start `/init &` in background and then do `obxprop -display :0` then touch the window you are interested in, in the Browser.
+  -->
   
   <!-- title="PhysiCell Studio" matches the main window -->
-  <application title="PhysiCell Studio">
+  <application title="PhysiCell Studio: /opt/pcstudio/config/PhysiCell_settings.xml" type="normal">
     <decor>yes</decor>
     <maximized>yes</maximized>
     <fullscreen>yes</fullscreen>
@@ -540,13 +544,13 @@
     <layer>above</layer>
   </application>
 
-  <application type="utility" class="QuPath">
+  <application type="utility" class="studio.py">
     <decor>yes</decor>
     <maximized>no</maximized>
     <layer>above</layer>
   </application>
 
-  <application type="splash" class="QuPath">
+  <application type="splash" class="studio.py">
     <decor>yes</decor>
     <maximized>no</maximized>
     <layer>above</layer>
