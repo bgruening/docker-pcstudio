@@ -5,7 +5,7 @@
 ### Build and (attempt to) run the image locally; upload it
 
 ```bash
-# "name-of-image" that I used was "ubu-studio". I uploaded to my (heiland) Docker Hub
+# "name-of-image" that I used was "physicell-studio". I uploaded to my (heiland) Docker Hub
 # and it is referenced in the "interactivetool_physicell_studio.xml" file (below)
 docker build -t name-of-image .
 
