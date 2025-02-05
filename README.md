@@ -26,7 +26,7 @@ docker push heiland/name-of-image
 Galaxy can run arbitrary Virtual Research Environments (VREs). In Galaxy terms, such VRE's are called "Interactive Tools", as they are using the same subsystem then normal Galaxy tools.
 The only requirement is that those tools needs to run in containers and expose a port(s) to which Galaxy can redirect users. 
 
-This repo provides sample files needed by a Galaxy server to be aware of this interactive tool:
+This repo provides sample files (for personal use) needed by a Galaxy server to be aware of this interactive tool:
 * [job_conf.yml](./job_conf.yml) - put in /config
 * [tool_conf.xml](./tool_conf.xml) - put in /config
-* [interactivetool_physicell_studio.xml](./interactivetool_physicell_studio.xml) - put in /tools/interactive
+* [interactivetool_pcstudio.xml](./interactivetool_pcstudio.xml) - put in /tools/interactive
