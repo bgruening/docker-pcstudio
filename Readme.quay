@@ -1,0 +1,4 @@
+ docker build -t  physicell/pcstudio .
+ docker tag physicell/pcstudio quay.io/physicell/pcstudio:0.1
+ docker images
+ docker push quay.io/physicell/pcstudio:0.1
