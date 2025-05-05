@@ -14,7 +14,7 @@
     </domain>
 
     <overall>
-        <max_time units="min">7200</max_time>
+        <max_time units="min">4320.0</max_time>
         <time_units>min</time_units>
         <space_units>micron</space_units>
         <dt_diffusion units="min">0.01</dt_diffusion>
@@ -92,6 +92,9 @@
                         <duration index="2" fixed_duration="true">240</duration>
                         <duration index="3" fixed_duration="true">60</duration>
                     </phase_durations>
+                    <standard_asymmetric_division enabled="False">
+                        <asymmetric_division_probability name="default" units="dimensionless">1.0</asymmetric_division_probability>
+                    </standard_asymmetric_division>
                 </cycle>
                 <death>
                     <model code="100" name="apoptosis">
