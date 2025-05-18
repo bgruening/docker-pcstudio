@@ -28,6 +28,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET  # https://docs.python.org/2/library/xml.etree.elementtree.html
 # from xml.dom import minidom   # possibly explore later if we want to access/update *everything* in the DOM
 import numpy as np
+from galaxy_ie_helpers import put
 
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import *
@@ -107,6 +108,7 @@ class PhysiCellXMLCreator(QWidget):
         self.model3D_flag = model3D_flag 
         self.tensor_flag = tensor_flag 
         self.nanohub_flag = nanohub_flag 
+        self.galaxy_flag = True 
         self.ecm_flag = False 
         self.pytest_flag = pytest_flag 
         self.biwt_flag = biwt_flag
@@ -589,6 +591,10 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
             file_menu.addAction("Save user project", self.save_user_proj_cb)
             file_menu.addAction("Load user project", self.load_user_proj_cb)
 
+        if self.galaxy_flag:
+            self.download_menu = file_menu.addMenu('Download')
+            # self.download_config_item = self.download_menu.addAction("Download as mymodel.xml", self.download_config_galaxy_cb)
+            self.download_config_item = self.download_menu.addAction("Download PhysiCell_settings.xml", self.download_config_galaxy_cb)
 
         if self.nanohub_flag:
             self.download_menu = file_menu.addMenu('Download')
@@ -1263,6 +1269,12 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
         self.message("Download process finished.")
         print("-- download finished.")
         self.p = None
+
+    def download_config_galaxy_cb(self):
+        # put("config/PhysiCell_settings.xml")
+        #     put( args.filepath, file_type=args.filetype, history_id=args.history_id )
+        put("PhysiCell_settings.xml")
+        return
 
     def download_config_cb(self):
         if self.nanohub_flag:
