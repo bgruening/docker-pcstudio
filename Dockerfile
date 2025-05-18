@@ -38,7 +38,7 @@ RUN apt-get update -y && \
     rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m venv /usr/local/pcstudio-venv
-RUN /usr/local/pcstudio-venv/bin/pip install matplotlib scipy pandas PyQt5
+RUN /usr/local/pcstudio-venv/bin/pip install matplotlib scipy pandas PyQt5 galaxy-ie-helpers
 
 RUN mkdir -p /opt/pcstudio/bin/images &&\
     mkdir -p /opt/pcstudio/bin/icon &&\
