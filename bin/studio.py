@@ -1273,7 +1273,11 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
     def download_config_galaxy_cb(self):
         # put("config/PhysiCell_settings.xml")
         #     put( args.filepath, file_type=args.filetype, history_id=args.history_id )
-        put("PhysiCell_settings.xml")
+        fname = "/opt/pcstudio/config/PhysiCell_settings.xml"
+        try:
+            put(fname)
+        except:
+            self.show_error_message(f"Error: put({fname})")
         return
 
     def download_config_cb(self):
