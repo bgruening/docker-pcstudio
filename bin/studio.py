@@ -577,24 +577,28 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
             file_menu.addAction("Save as", self.save_as_cb)
             file_menu.addAction("Save", self.save_cb, QtGui.QKeySequence('Ctrl+s'))
             #------
-            export_menu = file_menu.addMenu("Export")
+            if not self.galaxy_flag:
+                export_menu = file_menu.addMenu("Export")
 
-            simularium_act = QAction('Simularium', self)
-            export_menu.addAction(simularium_act)
-            simularium_act.triggered.connect(self.simularium_cb)
-            if not self.studio_flag:
-                print("simularium_installed is ",simularium_installed)
-                export_menu.setEnabled(False)
+                simularium_act = QAction('Simularium', self)
+                export_menu.addAction(simularium_act)
+                simularium_act.triggered.connect(self.simularium_cb)
+                if not self.studio_flag:
+                    print("simularium_installed is ",simularium_installed)
+                    export_menu.setEnabled(False)
 
-            #------
-            file_menu.addSeparator()
-            file_menu.addAction("Save user project", self.save_user_proj_cb)
-            file_menu.addAction("Load user project", self.load_user_proj_cb)
+                #------
+                file_menu.addSeparator()
+                file_menu.addAction("Save user project", self.save_user_proj_cb)
+                file_menu.addAction("Load user project", self.load_user_proj_cb)
 
         if self.galaxy_flag:
-            self.download_menu = file_menu.addMenu('Download')
+            # self.download_menu = file_menu.addMenu('Download')
+            self.download_menu = file_menu.addMenu('put on History')
             # self.download_config_item = self.download_menu.addAction("Download as mymodel.xml", self.download_config_galaxy_cb)
-            self.download_config_item = self.download_menu.addAction("Download PhysiCell_settings.xml", self.download_config_galaxy_cb)
+            self.download_config_item = self.download_menu.addAction("current config .xml", self.download_config_galaxy_cb)
+            self.download_zipped_csv_item = self.download_menu.addAction("all_csv.zip", self.download_zipped_csv_galaxy_cb)
+            self.download_all_zipped_item = self.download_menu.addAction("all_output.zip", self.download_all_zipped_galaxy_cb)
 
         if self.nanohub_flag:
             self.download_menu = file_menu.addMenu('Download')
@@ -629,8 +633,9 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
                 vis2D_model_summary_act = view_menu.addAction("Model summary", self.model_summary_cb)
 
 
-        action_menu = menubar.addMenu('&Action')
-        action_menu.addAction("Run", self.run_model_cb, QtGui.QKeySequence('Ctrl+r'))
+        if not self.galaxy_flag:
+            action_menu = menubar.addMenu('&Action')
+            action_menu.addAction("Run", self.run_model_cb, QtGui.QKeySequence('Ctrl+r'))
 
         # help_menu = menubar.addMenu('&Help')
         # # help_menu.triggered.connect(self.open_help_url)
@@ -1273,11 +1278,76 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
     def download_config_galaxy_cb(self):
         # put("config/PhysiCell_settings.xml")
         #     put( args.filepath, file_type=args.filetype, history_id=args.history_id )
-        fname = "/opt/pcstudio/config/PhysiCell_settings.xml"
+        # fname = "/opt/pcstudio/config/PhysiCell_settings.xml"
+        fname = self.current_xml_file 
         try:
             put(fname)
         except:
             self.show_error_message(f"Error: put({fname})")
+        return
+
+    def download_zipped_csv_galaxy_cb(self):
+        if True:
+            try:
+                if self.p is None:  # No process running.
+                    self.p = QProcess()
+                    self.p.readyReadStandardOutput.connect(self.handle_stdout)
+                    self.p.readyReadStandardError.connect(self.handle_stderr)
+                    self.p.stateChanged.connect(self.handle_state)
+                    self.p.finished.connect(self.process_finished)  # Clean up once complete.
+
+                    # file_str = os.path.join(self.output_dir, '*.svg')
+                    file_str = "output/*.csv"
+                    print('-------- download_zipped_csv_galaxy_cb(): zip up all ',file_str)
+                    # fname = "/opt/pcstudio/output/all_csv.zip"
+                    fname = "/opt/pcstudio/all_csv.zip"
+                    with zipfile.ZipFile('all_csv.zip', 'w') as myzip:
+                        for f in glob.glob(file_str):
+                            myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename 
+                    # self.p.start("exportfile svg.zip")
+                    try:
+                        put(fname)
+                    except:
+                        self.show_error_message(f"Error: put({fname})")
+                else:
+                    # self.debug_tab.add_msg(" download_svg_cb():  self.p is NOT None; just return!")
+                    print(" download_zipped_csv_galaxy_cb():  self.p is NOT None; just return!")
+            except:
+                self.message("Unable to download csv.zip")
+                print("Unable to download csv.zip")
+                self.p = None
+        return
+
+    def download_all_zipped_galaxy_cb(self):
+        if True:
+            try:
+                if self.p is None:  # No process running.
+                    self.p = QProcess()
+                    self.p.readyReadStandardOutput.connect(self.handle_stdout)
+                    self.p.readyReadStandardError.connect(self.handle_stderr)
+                    self.p.stateChanged.connect(self.handle_state)
+                    self.p.finished.connect(self.process_finished)  # Clean up once complete.
+
+                    # file_str = os.path.join(self.output_dir, '*.svg')
+                    file_str = "output/*"
+                    print('-------- download_all_zipped_galaxy_cb(): zip up all ',file_str)
+                    # fname = "/opt/pcstudio/output/all_csv.zip"
+                    fname = "/opt/pcstudio/all_output.zip"
+                    with zipfile.ZipFile('all_output.zip', 'w') as myzip:
+                        for f in glob.glob(file_str):
+                            myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename 
+                    # self.p.start("exportfile svg.zip")
+                    try:
+                        put(fname)
+                    except:
+                        self.show_error_message(f"Error: put({fname})")
+                else:
+                    # self.debug_tab.add_msg(" download_svg_cb():  self.p is NOT None; just return!")
+                    print(" download_all_zipped_galaxy_cb():  self.p is NOT None; just return!")
+            except:
+                self.message("Unable to download all_output.zip")
+                print("Unable to download all_output.zip")
+                self.p = None
         return
 
     def download_config_cb(self):
