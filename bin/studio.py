@@ -28,7 +28,12 @@ from pathlib import Path
 import xml.etree.ElementTree as ET  # https://docs.python.org/2/library/xml.etree.elementtree.html
 # from xml.dom import minidom   # possibly explore later if we want to access/update *everything* in the DOM
 import numpy as np
-from galaxy_ie_helpers import put
+from galaxy_history import GalaxyHistoryWindow
+try:
+    from galaxy_ie_helpers import put, find_matching_history_ids, get
+except:
+    print("----- cannot import from galaxy_ie_helpers ")
+    pass
 
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import *
@@ -536,6 +541,13 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
         print("studio.py: filterUI_cb")
         self.vis_tab.filterUI_cb()
 
+    def get_galaxy_history_cb(self):
+        self.galaxy_historyUI = GalaxyHistoryWindow()
+
+        # hack to bring to foreground
+        self.galaxy_historyUI.hide()
+        self.galaxy_historyUI.show()
+
     def run_model_cb(self):
         print("studio.py: run_model_cb")
         self.run_tab.run_model_cb()
@@ -594,6 +606,7 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
 
         if self.galaxy_flag:
             # self.download_menu = file_menu.addMenu('Download')
+            file_menu.addAction("get from History", self.get_galaxy_history_cb)
             self.download_menu = file_menu.addMenu('put on History')
             # self.download_config_item = self.download_menu.addAction("Download as mymodel.xml", self.download_config_galaxy_cb)
             self.download_config_item = self.download_menu.addAction("current config .xml", self.download_config_galaxy_cb)
@@ -1274,6 +1287,9 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
         self.message("Download process finished.")
         print("-- download finished.")
         self.p = None
+
+    # def get_galaxy_history_cb(self):
+    #     GalaxyHistoryWindow()
 
     def download_config_galaxy_cb(self):
         # put("config/PhysiCell_settings.xml")
