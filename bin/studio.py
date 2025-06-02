@@ -23,6 +23,7 @@ import argparse
 import logging
 import traceback
 import shutil # for possible copy of file
+import zipfile
 import glob
 from pathlib import Path
 import xml.etree.ElementTree as ET  # https://docs.python.org/2/library/xml.etree.elementtree.html
@@ -1303,70 +1304,62 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
         return
 
     def download_zipped_csv_galaxy_cb(self):
-        fname = "/opt/pcstudio/all_csv.zip"
+        # fname = "/opt/pcstudio/all_csv.zip"
+        fname = "all_csv.zip"
+        print("download_zipped_csv_galaxy_cb():  cwd= ",os.getcwd())
         try:
-            # if self.p is None:  # No process running.
-            if True:  # No process running.
-                # self.p = QProcess()
-                # self.p.readyReadStandardOutput.connect(self.handle_stdout)
-                # self.p.readyReadStandardError.connect(self.handle_stderr)
-                # self.p.stateChanged.connect(self.handle_state)
-                # self.p.finished.connect(self.process_finished)  # Clean up once complete.
-
-                # file_str = os.path.join(self.output_dir, '*.svg')
-                file_str = "/opt/pcstudio/output/*.csv"
-                print('-------- download_zipped_csv_galaxy_cb(): zip up all ',file_str)
-                # fname = "/opt/pcstudio/output/all_csv.zip"
-                with zipfile.ZipFile(fname, 'w') as myzip:
-                    for f in glob.glob(file_str):
-                        myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename 
-                # self.p.start("exportfile svg.zip")
-                try:
-                    put(fname)
-                except:
-                    self.show_error_message(f"Error: put({fname})")
-            else:
-                # self.debug_tab.add_msg(" download_svg_cb():  self.p is NOT None; just return!")
-                self.message(f"self.p is not None. Unable to download {fname}")
-                print(" download_zipped_csv_galaxy_cb():  self.p is NOT None; just return!")
+            # file_str = "/opt/pcstudio/output/*.csv"
+            file_str = "output/*.csv"
+            file_str = os.path.join(os.getcwd(), file_str)
+            print('-------- download_zipped_csv_galaxy_cb(): zip up all ',file_str)
+            # fname = "/opt/pcstudio/output/all_csv.zip"
+            with zipfile.ZipFile(fname, 'w') as myzip:
+                # csv_files = glob.glob(file_str)
+                # print("csv_files = ",csv_files)
+                for f in glob.glob(file_str):
+                    myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename 
         except:
-            self.message(f"Unable to download {fname}")
-            print("Unable to download csv.zip")
-            # self.p = None
-        return
+            self.show_error_message(f"Error zipping all output/*.csv")
+            return
+
+        try:
+            put(fname)
+        except:
+            self.show_error_message(f"Error: put({fname})")
+
+        # else:
+        #     # self.debug_tab.add_msg(" download_svg_cb():  self.p is NOT None; just return!")
+        #     self.message(f"self.p is not None. Unable to download {fname}")
+        #     print(" download_zipped_csv_galaxy_cb():  self.p is NOT None; just return!")
+        # except:
+        #     self.message(f"Unable to download {fname}")
+        #     print("Unable to download csv.zip")
+        #     # self.p = None
+        # return
 
     def download_all_zipped_galaxy_cb(self):
-        fname = "/opt/pcstudio/all_output.zip"
+        # fname = "/opt/pcstudio/all_output.zip"
+        fname = "all_output.zip"
+        print("download_all_zipped_galaxy_cb():  cwd= ",os.getcwd())
         try:
-            # if self.p is None:  # No process running.
-            if True:  # No process running.
-                self.p = QProcess()
-                self.p.readyReadStandardOutput.connect(self.handle_stdout)
-                self.p.readyReadStandardError.connect(self.handle_stderr)
-                self.p.stateChanged.connect(self.handle_state)
-                self.p.finished.connect(self.process_finished)  # Clean up once complete.
-
-                # file_str = os.path.join(self.output_dir, '*.svg')
-                file_str = "/opt/pcstudio/output/*"
-                print('-------- download_all_zipped_galaxy_cb(): zip up all ',file_str)
-                # fname = "/opt/pcstudio/output/all_csv.zip"
-                with zipfile.ZipFile(fname, 'w') as myzip:
-                    for f in glob.glob(file_str):
-                        myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename 
-                # self.p.start("exportfile svg.zip")
-                try:
-                    put(fname)
-                except:
-                    self.show_error_message(f"Error: put({fname})")
-            else:
-                # self.debug_tab.add_msg(" download_svg_cb():  self.p is NOT None; just return!")
-                self.message(f"self.p is not None. Unable to download {fname}")
-                print(" download_all_zipped_galaxy_cb():  self.p is NOT None; just return!")
+            # file_str = "/opt/pcstudio/output/*.csv"
+            file_str = "output/*"
+            file_str = os.path.join(os.getcwd(), file_str)
+            print('-------- download_all_zipped_galaxy_cb(): zip up all ',file_str)
+            # fname = "/opt/pcstudio/output/all_csv.zip"
+            with zipfile.ZipFile(fname, 'w') as myzip:
+                # all_files = glob.glob(file_str)
+                # print("all_files = ",all_files)
+                for f in glob.glob(file_str):
+                    myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename 
         except:
-            self.message(f"Unable to download {fname}")
-            print("Unable to download all_output.zip")
-            # self.p = None
-        return
+            self.show_error_message(f"Error zipping all output/*")
+            return
+
+        try:
+            put(fname)
+        except:
+            self.show_error_message(f"Error: put({fname})")
 
     def download_config_cb(self):
         if self.nanohub_flag:
