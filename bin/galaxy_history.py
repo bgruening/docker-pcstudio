@@ -122,12 +122,13 @@ class GalaxyHistoryWindow(QWidget):
     def get_file_cb(self,sval):
         self.file_id = int(self.file_id_w.text())
         try:
-            fid = find_matching_history_ids(self.file_id)
-            get(fid)
+            # fid = find_matching_history_ids(self.file_id)
+            # get(fid)
+            get(self.file_id)
         except:
             print("Unable to get the file from History")
             msgBox = QMessageBox()
-            msgBox.setText(f'Unable to get file with History ID {self.file_id}')
+            msgBox.setText(f'Unable to get file with History ID {self.file_id}. Perhaps you got it previously.')
             msgBox.setStandardButtons(QMessageBox.Ok)
             returnValue = msgBox.exec()
 
