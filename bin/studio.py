@@ -107,14 +107,15 @@ class PhysiCellXMLCreator(QWidget):
             from vis_tab import Vis 
 
         self.studio_flag = studio_flag 
-        self.fix_min_size = True
         # self.view_shading = None
         self.skip_validate_flag = skip_validate_flag 
         self.rules_flag = rules_flag 
         self.model3D_flag = model3D_flag 
         self.tensor_flag = tensor_flag 
         self.nanohub_flag = nanohub_flag 
+
         self.galaxy_flag = True 
+        self.fix_min_size = not self.galaxy_flag
         self.ecm_flag = False 
         self.pytest_flag = pytest_flag 
         self.biwt_flag = biwt_flag
