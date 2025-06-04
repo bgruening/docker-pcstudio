@@ -315,6 +315,8 @@ class VisBase():
 
         self.vis_filter_init_flag = True
 
+        self.galaxy_flag = True   # being lazy here, ugh
+
         self.studio_flag = studio_flag 
         self.rules_flag = rules_flag 
 
@@ -1008,20 +1010,21 @@ class VisBase():
         self.legend_svg_button.clicked.connect(self.legend_svg_plot_cb)
         self.vbox.addWidget(self.legend_svg_button)
 
-        self.vbox.addWidget(QHLine())
-        hbox = QHBoxLayout()
-        self.movie_name_edit = QLineEdit()
-        self.movie_name_edit.setText("movie.mp4")
-        hbox.addWidget(self.movie_name_edit)
-        self.make_movie_button = QPushButton("Make Movie")
-        self.make_movie_button.setFixedWidth(120)
-        self.make_movie_button.clicked.connect(self.make_movie_cb)
-        hbox.addWidget(self.make_movie_button)
-        self.cancel_button = QPushButton("Cancel")
-        self.cancel_button.setFixedWidth(120)
-        self.cancel_button.clicked.connect(self.cancel_movie_cb)
-        hbox.addWidget(self.cancel_button)
-        self.vbox.addLayout(hbox)
+        if not self.galaxy_flag:
+            self.vbox.addWidget(QHLine())
+            hbox = QHBoxLayout()
+            self.movie_name_edit = QLineEdit()
+            self.movie_name_edit.setText("movie.mp4")
+            hbox.addWidget(self.movie_name_edit)
+            self.make_movie_button = QPushButton("Make Movie")
+            self.make_movie_button.setFixedWidth(120)
+            self.make_movie_button.clicked.connect(self.make_movie_cb)
+            hbox.addWidget(self.make_movie_button)
+            self.cancel_button = QPushButton("Cancel")
+            self.cancel_button.setFixedWidth(120)
+            self.cancel_button.clicked.connect(self.cancel_movie_cb)
+            hbox.addWidget(self.cancel_button)
+            self.vbox.addLayout(hbox)
 
         self.physiboss_qline = None
         
