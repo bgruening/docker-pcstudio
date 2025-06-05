@@ -61,19 +61,21 @@ class GalaxyHistoryWindow(QWidget):
 
         #-------------------------------------------
         idx_row = 0
-        self.get_file_button = QPushButton("get file with ID=")
-        self.get_file_button.setStyleSheet("background-color: lightgreen;")
-        self.get_file_button.clicked.connect(self.get_file_cb)
-        glayout.addWidget(self.get_file_button, idx_row,0,1,2) # w, row, column, rowspan, colspan
+        # self.get_file_button = QPushButton("get file with ID=")
+        # self.get_file_button.setEnabled(False)
+        # self.get_file_button.setStyleSheet("background-color: lightgreen;")
+        # self.get_file_button.clicked.connect(self.get_file_cb)
+        # glayout.addWidget(self.get_file_button, idx_row,0,1,2) # w, row, column, rowspan, colspan
 
-        self.file_id_w = QLineEdit("0")  # str(self.vis_tab.axes_x_center))
-        self.file_id_w.setFixedWidth(70)
-        self.file_id_w.setValidator(QIntValidator())
-        self.file_id_w.textChanged.connect(self.file_id_changed)
-        glayout.addWidget(self.file_id_w , idx_row,2, 1,1) # w, row, column, rowspan, colspan
-        #--------------------------------
+        # self.file_id_w = QLineEdit("0")  # str(self.vis_tab.axes_x_center))
+        # self.file_id_w.setEnabled(False)
+        # self.file_id_w.setFixedWidth(70)
+        # self.file_id_w.setValidator(QIntValidator())
+        # self.file_id_w.textChanged.connect(self.file_id_changed)
+        # glayout.addWidget(self.file_id_w , idx_row,2, 1,1) # w, row, column, rowspan, colspan
+        # #--------------------------------
 
-        idx_row += 1
+        # idx_row += 1
         # glayout.addWidget(QHLine(), idx_row,0,1,4) # w, row, column, rowspan, colspan
         glayout.addWidget(QLabel(f"pwd: {Path.cwd()}"), idx_row,0,1,2) # w, row, column, rowspan, colspan
 
