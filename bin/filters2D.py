@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QFrame,QApplication,QWidget,QTabWidget,QFormLayout,QLineEdit, QGroupBox, QHBoxLayout,QVBoxLayout,QRadioButton,QLabel,QCheckBox,QComboBox,QScrollArea,  QMainWindow,QGridLayout, QPushButton, QFileDialog, QMessageBox, QStackedWidget, QSplitter
-from studio_classes import DoubleValidatorWidgetBounded
+from studio_classes import DoubleValidatorWidgetBounded, HoverQuestion, QCheckBox_custom
 # from PyQt5.QtWidgets import QCompleter, QSizePolicy
 # from PyQt5.QtCore import QSortFilterProxyModel
 # from PyQt5.QtSvg import QSvgWidget
@@ -13,33 +13,6 @@ class QHLine(QFrame):
         super(QHLine, self).__init__()
         self.setFrameShape(QFrame.HLine)
         self.setFrameShadow(QFrame.Sunken)
-        # self.setFrameShadow(QFrame.Plain)
-        # self.setStyleSheet("border:1px solid black")
-
-class QCheckBox_custom(QCheckBox):  # it's insane to have to do this!
-    def __init__(self,name):
-        super(QCheckBox, self).__init__(name)
-
-        checkbox_style = """
-                QCheckBox::indicator:checked {
-                    background-color: rgb(255,255,255);
-                    border: 1px solid #5A5A5A;
-                    width : 15px;
-                    height : 15px;
-                    border-radius : 3px;
-                    image: url(images:checkmark.png);
-                }
-                QCheckBox::indicator:unchecked
-                {
-                    background-color: rgb(255,255,255);
-                    border: 1px solid #5A5A5A;
-                    width : 15px;
-                    height : 15px;
-                    border-radius : 3px;
-                }
-                """
-        self.setStyleSheet(checkbox_style)
-
 
 class FilterUI2DWindow(QWidget):
     # def __init__(self, output_dir):
@@ -97,6 +70,22 @@ class FilterUI2DWindow(QWidget):
         self.cells_csv_button.clicked.connect(self.cells_csv_cb)
         glayout.addWidget(self.cells_csv_button, idx_row,0,1,2) # w, row, column, rowspan, colspan
         #--------------------------------
+
+        #----------
+        idx_row += 1
+        glayout.addWidget(QHLine(), idx_row,0,1,4) # w, row, column, rowspan, colspan
+        idx_row += 1
+        self.attachments_checkbox = QCheckBox_custom('attachments')
+        self.attachments_checkbox.setChecked(self.vis_tab.attachments_checked_flag)
+        self.attachments_checkbox.clicked.connect(self.attachments_toggle_cb)
+        glayout.addWidget(self.attachments_checkbox)
+
+        msg = """
+Note: only for .mat cell plots (not .svg)
+        """
+        self.attachments_question_label = HoverQuestion(msg)
+        self.attachments_question_label.show_icon()
+        glayout.addWidget(self.attachments_question_label, idx_row,1,1,4) # w, row, column, rowspan, colspan
 
         idx_row += 1
         glayout.addWidget(QHLine(), idx_row,0,1,4) # w, row, column, rowspan, colspan
@@ -282,6 +271,11 @@ class FilterUI2DWindow(QWidget):
         # self.vis_tab.write_cells_csv_cb()
         self.vis_tab.phenotype_cb()
         pass
+
+    def attachments_toggle_cb(self, bval):
+        self.vis_tab.attachments_checked_flag = bval
+        self.vis_tab.update_plots()
+    
 
     def contour_mesh_cb(self):
         bval = self.contour_mesh_checkbox.isChecked()

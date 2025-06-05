@@ -312,10 +312,8 @@ class VisBase():
         # global self.config_params
         super(VisBase,self).__init__(**kw)
 
-
+        self.galaxy_flag = True
         self.vis_filter_init_flag = True
-
-        self.galaxy_flag = True   # being lazy here, ugh
 
         self.studio_flag = studio_flag 
         self.rules_flag = rules_flag 
@@ -354,6 +352,7 @@ class VisBase():
         self.bgcolor = [1,1,1,1]  # all 1.0 for white 
 
         self.discrete_variable_observed = set()
+        self.cell_scalar_updated = True
 
         self.cell_scalar_human2mcds_dict = {} # initialize here for vis_tab.py
 
@@ -489,6 +488,8 @@ class VisBase():
         self.fix_cmap_flag = False
         self.cells_edge_checked_flag = True
 
+        self.attachments_checked_flag = False
+
         self.contour_mesh = True
         self.contour_lines = False
         self.num_contours = 50
@@ -560,6 +561,8 @@ class VisBase():
 
         self.cax1 = None
         self.cax2 = None
+
+        self.cbar2 = None
 
         self.figsize_width_2Dplot = basic_length
         self.figsize_height_2Dplot = basic_length
@@ -762,7 +765,7 @@ class VisBase():
 
         # Filter button
         self.cell_type_filter_button = QPushButton("Filter")
-        self.cell_type_filter_button.setFixedWidth(100)
+        self.cell_type_filter_button.setFixedWidth(70)
         self.cell_type_filter_button.clicked.connect(self.cell_type_filter_button_cb)
         self.cells_hbox.addWidget(self.cell_type_filter_button)
 
@@ -959,7 +962,7 @@ class VisBase():
 
         #------------------
         self.vbox.addWidget(QHLine())
-
+        
         hbox = QHBoxLayout()
         label = QLabel("folder")
         label.setAlignment(QtCore.Qt.AlignRight)
@@ -984,7 +987,7 @@ class VisBase():
         hbox = QHBoxLayout()
         self.cell_counts_button = QPushButton("Population plot")
         # self.cell_counts_button.setStyleSheet("QPushButton {background-color: lightgreen; color: black;}")
-        bwidth = 120
+        bwidth = 130
         self.cell_counts_button.setFixedWidth(bwidth)
         self.cell_counts_button.clicked.connect(self.cell_counts_cb)
         hbox.addWidget(self.cell_counts_button)
@@ -1017,11 +1020,11 @@ class VisBase():
             self.movie_name_edit.setText("movie.mp4")
             hbox.addWidget(self.movie_name_edit)
             self.make_movie_button = QPushButton("Make Movie")
-            self.make_movie_button.setFixedWidth(120)
+            self.make_movie_button.setFixedWidth(100)
             self.make_movie_button.clicked.connect(self.make_movie_cb)
             hbox.addWidget(self.make_movie_button)
             self.cancel_button = QPushButton("Cancel")
-            self.cancel_button.setFixedWidth(120)
+            self.cancel_button.setFixedWidth(70)
             self.cancel_button.clicked.connect(self.cancel_movie_cb)
             hbox.addWidget(self.cancel_button)
             self.vbox.addLayout(hbox)
@@ -1118,7 +1121,7 @@ class VisBase():
         self.get_cell_types_from_config()
         
         for idx, cell_type in enumerate(self.celltype_name):
-            checkbox = QCheckBox(cell_type)
+            checkbox = QCheckBox_custom(cell_type)
             # preserve last checked values and if empty, check all
             if ( (idx in self.celltype_filter) | (not self.celltype_filter) ):
                 checkbox.setChecked(True)
@@ -1139,16 +1142,25 @@ class VisBase():
             self.update_plots()
             # self.filter_dialog.accept() # close self.filter_dialog if press the apply button
 
+        hbox = QHBoxLayout()
         apply_button = QPushButton("Apply")
+        apply_button.setFixedWidth(75)
         apply_button.clicked.connect(apply_filters)
         apply_button.setStyleSheet("background-color: lightgreen")
-        layout.addWidget(apply_button)
+        hbox.addWidget(apply_button)
+
+        close_button = QPushButton("Close")
+        close_button.setFixedWidth(75)
+        close_button.clicked.connect(self.filter_dialog.close)
+        close_button.setStyleSheet("background-color: lightgreen")
+        hbox.addWidget(close_button)
+        layout.addLayout(hbox)
 
         self.filter_dialog.setLayout(layout)
         self.filter_dialog.show()
 
     def cell_type_filter_button_cb(self):
-        print("---- vis_base: cell_type_filter_button_cb()")
+        # print("---- vis_base: cell_type_filter_button_cb()")
         self.show_filter_popup()
 
     def phenotype_cb(self):
@@ -1190,7 +1202,7 @@ class VisBase():
                 for var in uep.findall('cell_definition'):
                     name = var.attrib['name']
                     self.celltype_name.append(name)
-            print("get_cell_types_from_config(): ",self.celltype_name)
+            # print("get_cell_types_from_config(): ",self.celltype_name)
         except:
             msgBox = QMessageBox()
             msgBox.setIcon(QMessageBox.Information)
@@ -1338,20 +1350,22 @@ class VisBase():
                     # print("--- rgb after split=",rgb)
                     ctcolor = [float(rgb[0])/255., float(rgb[1])/255., float(rgb[2])/255.]
                     # print("--- converted rgb=",ctcolor)
-                yval = np.array( [(np.count_nonzero((mcds[idx].data['discrete_cells']['data']['cell_type'] == itype) & (mcds[idx].data['discrete_cells']['data']['cycle_model'] < 100.) == True)) for idx in range(len(mcds))] )
+                if self.celltype_filter:
+                    yval = np.array( [(np.count_nonzero((np.isin(mcds[idx].data['discrete_cells']['data']['cell_type'], self.celltype_filter)) & (mcds[idx].data['discrete_cells']['data']['cell_type'] == itype) & (mcds[idx].data['discrete_cells']['data']['cycle_model'] < 100.) == True)) for idx in range(len(mcds))] )
+                else:
+                    yval = np.array( [(np.count_nonzero((mcds[idx].data['discrete_cells']['data']['cell_type'] == itype) & (mcds[idx].data['discrete_cells']['data']['cycle_model'] < 100.) == True)) for idx in range(len(mcds))] )
                 # yval = np.array( [(np.count_nonzero((mcds[idx].data['discrete_cells']['data']['cell_type'] == itype) == True)) for idx in range(len(mcds))] )
                 # print("  yval=",yval)
-
-                self.population_plot[self.discrete_scalar].ax0.plot(tval, yval, label=ctname, linewidth=lw, color=ctcolor)
+                if yval.sum() > 0: # only plot if there are cells of this type
+                    self.population_plot[self.discrete_scalar].ax0.plot(tval, yval, label=ctname, linewidth=lw, color=ctcolor)
 
 
             self.population_plot[self.discrete_scalar].ax0.set_xlabel('time (mins)')
             self.population_plot[self.discrete_scalar].ax0.set_ylabel('# of cells')
             self.population_plot[self.discrete_scalar].ax0.set_title("cell_type", fontsize=10)
-            self.population_plot[self.discrete_scalar].ax0.legend(loc='center right', prop={'size': 8})
+            self.population_plot[self.discrete_scalar].ax0.legend(loc='center left', prop={'size': 8})
             self.population_plot[self.discrete_scalar].canvas.update()
             self.population_plot[self.discrete_scalar].canvas.draw()
-            # self.population_plot[self.discrete_scalar].ax0.legend(loc='center right', prop={'size': 8})
             self.population_plot[self.discrete_scalar].show()
 
         #--------
@@ -1385,18 +1399,40 @@ class VisBase():
                 # yval = np.array( [(np.count_nonzero((mcds[idx].data['discrete_cells']['data'][self.discrete_scalar] == itype) & True) for idx in range(len(mcds)))] )
 
                 # TODO: fix this hackiness. Do we want to avoid counting dead cells??
-                yval = np.array( [(np.count_nonzero((mcds[idx].data['discrete_cells']['data'][self.discrete_scalar] == itype) & (mcds[idx].data['discrete_cells']['data']['cycle_model'] < 999.) == True)) for idx in range(len(mcds))] )
+                if self.discrete_scalar == 'current_death_model': # Hack: because current_death_model is not working in PhysiCell, using cycle_model instead  
+                    if self.celltype_filter: # Cell type filter applied here
+                        yval = np.array( [(np.count_nonzero((np.isin(mcds[idx].data['discrete_cells']['data']['cell_type'], self.celltype_filter)) & (mcds[idx].data['discrete_cells']['data']['cycle_model'] == itype) & (mcds[idx].data['discrete_cells']['data']['cycle_model'] < 999.) == True)) for idx in range(len(mcds))] )
+                    else:
+                        yval = np.array( [(np.count_nonzero((mcds[idx].data['discrete_cells']['data']['cycle_model'] == itype) & (mcds[idx].data['discrete_cells']['data']['cycle_model'] < 999.) == True)) for idx in range(len(mcds))] )
+                else:
+                    if self.celltype_filter: # Cell type filter applied here
+                        yval = np.array( [(np.count_nonzero((np.isin(mcds[idx].data['discrete_cells']['data']['cell_type'], self.celltype_filter)) & (mcds[idx].data['discrete_cells']['data'][self.discrete_scalar] == itype) & (mcds[idx].data['discrete_cells']['data']['cycle_model'] < 999.) == True)) for idx in range(len(mcds))] )
+                    else:
+                        yval = np.array( [(np.count_nonzero((mcds[idx].data['discrete_cells']['data'][self.discrete_scalar] == itype) & (mcds[idx].data['discrete_cells']['data']['cycle_model'] < 999.) == True)) for idx in range(len(mcds))] )
                 # print("  yval=",yval)
 
+                # if (self.discrete_scalar == 'cycle_model'): mylabel = 
+                # else:
+                # Check if exist any cells in the entire simulation with self.discrete_scalar occuring
                 mylabel = str(itype)
-                self.population_plot[self.discrete_scalar].ax0.plot(tval, yval, label=mylabel, linewidth=lw, color=ctcolor)
+                bool_list = ['is_motile', 'dead']
+                if( yval.sum() > 0 or self.discrete_scalar in bool_list): # only plot if there are cells with this scalar or boolean
+                    if (self.discrete_scalar == 'cycle_model' or self.discrete_scalar == 'current_death_model'): mylabel = self.cycle_models[itype]
+                    elif (self.discrete_scalar == 'current_phase'): mylabel = self.cycle_phases[itype]
+                    elif (self.discrete_scalar in bool_list ): mylabel = str(bool(itype))
+                    # Plot only if there are cells with this scalar
+                    self.population_plot[self.discrete_scalar].ax0.plot(tval, yval, label=mylabel, linewidth=lw, color=ctcolor)
                 # self.population_plot[self.discrete_scalar].ax0.plot(tval, yval, linewidth=lw, color=ctcolor)
+                # print(self.discrete_scalar, itype, mylabel, yval.sum() )
 
-
+            
             self.population_plot[self.discrete_scalar].ax0.set_xlabel('time (mins)')
             self.population_plot[self.discrete_scalar].ax0.set_ylabel('# of cells')
-            self.population_plot[self.discrete_scalar].ax0.set_title(self.discrete_scalar, fontsize=10)
-            self.population_plot[self.discrete_scalar].ax0.legend(loc='center right', prop={'size': 8})
+            if self.celltype_filter:
+                self.population_plot[self.discrete_scalar].ax0.set_title(self.discrete_scalar + " (filtered by cell type)", fontsize=10)
+            else:
+                self.population_plot[self.discrete_scalar].ax0.set_title(self.discrete_scalar, fontsize=10)
+            self.population_plot[self.discrete_scalar].ax0.legend(loc='center left', prop={'size': 8})
             self.population_plot[self.discrete_scalar].canvas.update()
             self.population_plot[self.discrete_scalar].canvas.draw()
             self.population_plot[self.discrete_scalar].show()
@@ -1731,6 +1767,7 @@ class VisBase():
 
     def cell_scalar_combobox_changed_cb(self, idx):
         self.discrete_variable_observed = set()
+        self.cell_scalar_updated = True
         self.update_plots()
     
     #-------------------------------------
