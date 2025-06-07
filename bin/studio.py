@@ -608,8 +608,9 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
 
         if self.galaxy_flag:
             # self.download_menu = file_menu.addMenu('Download')
-            # file_menu.addAction("get from History", self.get_galaxy_history_cb)
-            file_menu.addAction("get dir info", self.get_galaxy_history_cb)
+            file_menu.addAction("get from History", self.get_galaxy_history_cb)
+            # file_menu.addAction("get dir info", self.get_galaxy_history_cb)
+
             self.download_menu = file_menu.addMenu('put on History')
             # self.download_config_item = self.download_menu.addAction("Download as mymodel.xml", self.download_config_galaxy_cb)
             self.download_config_item = self.download_menu.addAction("current config .xml", self.download_config_galaxy_cb)
