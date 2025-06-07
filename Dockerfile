@@ -43,7 +43,10 @@ RUN /usr/local/pcstudio-venv/bin/pip install matplotlib scipy pandas PyQt5 galax
 RUN mkdir -p /opt/pcstudio/bin/images &&\
     mkdir -p /opt/pcstudio/bin/icon &&\
     mkdir -p /opt/pcstudio/config &&\
-    chmod -R 777 /opt/pcstudio 
+    chmod -R 777 /opt/pcstudio &&\
+    mkdir /import &&\
+    chmod -R 777 /import
+#    mkdir -p /opt/pcstudio/output &&\   # don't need as it's created on a "Run"
 
 # Generate and install favicons.
 # RUN APP_ICON_URL=https://github.com/pcstudio/pcstudio/wiki/images/pcstudio_131.png && \
