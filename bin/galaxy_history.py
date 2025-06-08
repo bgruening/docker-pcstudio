@@ -62,7 +62,7 @@ class GalaxyHistoryWindow(QWidget):
         #-------------------------------------------
         idx_row = 0
         self.get_file_button = QPushButton("get file with ID=")
-        self.get_file_button.setEnabled(False)
+        self.get_file_button.setEnabled(True)
         self.get_file_button.setStyleSheet("background-color: lightgreen;")
         self.get_file_button.clicked.connect(self.get_file_cb)
         glayout.addWidget(self.get_file_button, idx_row,0,1,2) # w, row, column, rowspan, colspan
