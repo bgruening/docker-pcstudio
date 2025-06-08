@@ -68,7 +68,7 @@ class GalaxyHistoryWindow(QWidget):
         glayout.addWidget(self.get_file_button, idx_row,0,1,2) # w, row, column, rowspan, colspan
 
         self.file_id_w = QLineEdit("0")  # str(self.vis_tab.axes_x_center))
-        self.file_id_w.setEnabled(False)
+        self.file_id_w.setEnabled(True)
         self.file_id_w.setFixedWidth(70)
         self.file_id_w.setValidator(QIntValidator())
         self.file_id_w.textChanged.connect(self.file_id_changed)
