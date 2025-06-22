@@ -23,18 +23,11 @@ import argparse
 import logging
 import traceback
 import shutil # for possible copy of file
-import zipfile
 import glob
 from pathlib import Path
 import xml.etree.ElementTree as ET  # https://docs.python.org/2/library/xml.etree.elementtree.html
 # from xml.dom import minidom   # possibly explore later if we want to access/update *everything* in the DOM
 import numpy as np
-from galaxy_history import GalaxyHistoryWindow
-try:
-    from galaxy_ie_helpers import put, find_matching_history_ids, get
-except:
-    print("----- cannot import from galaxy_ie_helpers ")
-    pass
 
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import *
@@ -56,6 +49,13 @@ from populate_tree_cell_defs import populate_tree_cell_defs
 from run_tab import RunModel 
 from settings import StudioSettings
 # from legend_tab import Legend 
+
+from galaxy_history import GalaxyHistoryWindow
+try:
+    from galaxy_ie_helpers import put, find_matching_history_ids, get
+except:
+    print("----- cannot import from galaxy_ie_helpers ")
+    pass
 
 try:
     from simulariumio import UnitData, MetaData, DisplayData, DISPLAY_TYPE, ModelMetaData
@@ -89,7 +89,7 @@ def quit_cb():
     studio_app.quit()
 
 class PhysiCellXMLCreator(QWidget):
-    def __init__(self, config_file, studio_flag, skip_validate_flag, rules_flag, model3D_flag, tensor_flag, exec_file, nanohub_flag, is_movable_flag, pytest_flag, biwt_flag, parent = None):
+    def __init__(self, config_file, studio_flag, skip_validate_flag, rules_flag, model3D_flag, tensor_flag, exec_file, nanohub_flag, galaxy_flag, is_movable_flag, pytest_flag, biwt_flag, parent = None):
         super(PhysiCellXMLCreator, self).__init__(parent)
         if model3D_flag:
             try:
@@ -106,6 +106,7 @@ class PhysiCellXMLCreator(QWidget):
         else:
             from vis_tab import Vis 
 
+        # self.current_xml_file = ""
         self.studio_flag = studio_flag 
         # self.view_shading = None
         self.skip_validate_flag = skip_validate_flag 
@@ -113,13 +114,13 @@ class PhysiCellXMLCreator(QWidget):
         self.model3D_flag = model3D_flag 
         self.tensor_flag = tensor_flag 
         self.nanohub_flag = nanohub_flag 
-
-        self.galaxy_flag = True 
+        self.galaxy_flag = galaxy_flag 
         self.fix_min_size = not self.galaxy_flag
         self.ecm_flag = False 
         self.pytest_flag = pytest_flag 
         self.biwt_flag = biwt_flag
         print("PhysiCellXMLCreator(): self.nanohub_flag= ",self.nanohub_flag)
+        print("PhysiCellXMLCreator(): self.galaxy_flag= ",self.galaxy_flag)
 
         self.rules_tab_index = None
 
@@ -142,8 +143,6 @@ class PhysiCellXMLCreator(QWidget):
         self.title_prefix = "PhysiCell Model Builder: "
         if studio_flag:
             self.title_prefix = "PhysiCell Studio: "
-
-        # self.studio_settings = StudioSettings(self, self.fix_min_size)  # pass in dict eventually
 
         self.vis2D_gouraud = False
 
@@ -404,7 +403,7 @@ class PhysiCellXMLCreator(QWidget):
 
             # config_tab needed for 3D domain boundary outline
             # self.vis_tab = Vis(self.studio_flag, self.nanohub_flag, self.config_tab, self.celldef_tab, self.run_tab, self.model3D_flag, self.tensor_flag, self.ecm_flag)
-            self.vis_tab = Vis(self.studio_flag, self.rules_flag, self.nanohub_flag, self.config_tab, self.microenv_tab, self.celldef_tab, self.user_params_tab, self.rules_tab, self.ics_tab, self.run_tab, self.model3D_flag, self.tensor_flag, self.ecm_flag)
+            self.vis_tab = Vis(self.studio_flag, self.rules_flag, self.nanohub_flag, self.config_tab, self.microenv_tab, self.celldef_tab, self.user_params_tab, self.rules_tab, self.ics_tab, self.run_tab, self.model3D_flag, self.tensor_flag, self.ecm_flag, self.galaxy_flag)
             # if not self.nanohub_flag:
             self.vis_tab.output_folder.setText(self.config_tab.folder.text())
             self.vis_tab.update_output_dir(self.config_tab.folder.text())
@@ -545,7 +544,6 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
 
     def get_galaxy_history_cb(self):
         self.galaxy_historyUI = GalaxyHistoryWindow()
-
         # hack to bring to foreground
         self.galaxy_historyUI.hide()
         self.galaxy_historyUI.show()
@@ -607,12 +605,8 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
                 file_menu.addAction("Load user project", self.load_user_proj_cb)
 
         if self.galaxy_flag:
-            # self.download_menu = file_menu.addMenu('Download')
             file_menu.addAction("get from History", self.get_galaxy_history_cb)
-            # file_menu.addAction("get dir info", self.get_galaxy_history_cb)
-
             self.download_menu = file_menu.addMenu('put on History')
-            # self.download_config_item = self.download_menu.addAction("Download as mymodel.xml", self.download_config_galaxy_cb)
             self.download_config_item = self.download_menu.addAction("current config .xml", self.download_config_galaxy_cb)
             self.download_zipped_csv_item = self.download_menu.addAction("all_csv.zip", self.download_zipped_csv_galaxy_cb)
             self.download_all_zipped_item = self.download_menu.addAction("all_output.zip", self.download_all_zipped_galaxy_cb)
@@ -625,8 +619,6 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
             self.download_svg_item = self.download_menu.addAction("Download cell (.svg) data", self.download_svg_cb)
             self.download_mat_item = self.download_menu.addAction("Download full (.mat) data", self.download_full_cb)
             self.download_graph_item = self.download_menu.addAction("Download cell graph (.txt) data", self.download_graph_cb)
-            # self.download_menu_item.setEnabled(False)
-            # self.download_menu.setEnabled(False)
         else:
             self.download_menu = None
 
@@ -654,10 +646,10 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
             action_menu = menubar.addMenu('&Action')
             action_menu.addAction("Run", self.run_model_cb, QtGui.QKeySequence('Ctrl+r'))
 
-        # help_menu = menubar.addMenu('&Help')
-        # # help_menu.triggered.connect(self.open_help_url)
-        # guide_act = help_menu.addAction("User Guide (link)", self.open_help_url)
-        # issues_act = help_menu.addAction("Create Issue (link)", self.create_issue_url)
+            help_menu = menubar.addMenu('&Help')
+            # help_menu.triggered.connect(self.open_help_url)
+            guide_act = help_menu.addAction("User Guide (link)", self.open_help_url)
+            issues_act = help_menu.addAction("Create Issue (link)", self.create_issue_url)
 
         menubar.adjustSize()  # Argh. Otherwise, only 1st menu appears, with ">>" to others!
 
@@ -1094,13 +1086,6 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
         msg.setFixedWidth(500)
         msg.exec_()
 
-    def show_info_message(self, message):
-        msgBox = QMessageBox()
-        msgBox.setIcon(QMessageBox.Information)
-        msgBox.setText(message)
-        msgBox.setStandardButtons(QMessageBox.Ok)
-        msgBox.exec_()
-
 
     def load_model(self,name):
         if self.studio_flag:
@@ -1299,81 +1284,6 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
         print("-- download finished.")
         self.p = None
 
-    def download_config_galaxy_cb(self):
-        # put("config/PhysiCell_settings.xml")
-        #     put( args.filepath, file_type=args.filetype, history_id=args.history_id )
-        # fname = "/opt/pcstudio/config/PhysiCell_settings.xml"
-        fname = self.current_xml_file 
-        self.show_info_message("This will start a job that copies your current model's config file to the Galaxy History. You can download it from there once it completes.")
-        try:
-            put(fname)
-            # print("dummy put...")
-        except:
-            self.show_error_message(f"Error: put({fname})")
-        return
-
-    def download_zipped_csv_galaxy_cb(self):
-        # fname = "/opt/pcstudio/all_csv.zip"
-        self.show_info_message("This will start a job that copies a zip file of all output/*.csv to the Galaxy History. You can download it from there once it completes.")
-        fname = "all_csv.zip"
-        print("download_zipped_csv_galaxy_cb():  cwd= ",os.getcwd())
-        try:
-            # file_str = "/opt/pcstudio/output/*.csv"
-            file_str = "output/*.csv"
-            file_str = os.path.join(os.getcwd(), file_str)
-            print('-------- download_zipped_csv_galaxy_cb(): zip up all ',file_str)
-            # fname = "/opt/pcstudio/output/all_csv.zip"
-            with zipfile.ZipFile(fname, 'w') as myzip:
-                # csv_files = glob.glob(file_str)
-                # print("csv_files = ",csv_files)
-                for f in glob.glob(file_str):
-                    myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename 
-        except:
-            self.show_error_message(f"Error zipping all output/*.csv")
-            return
-
-        try:
-            put(fname)
-            # print("dummy put...")
-        except:
-            self.show_error_message(f"Error: put({fname})")
-
-        # else:
-        #     # self.debug_tab.add_msg(" download_svg_cb():  self.p is NOT None; just return!")
-        #     self.message(f"self.p is not None. Unable to download {fname}")
-        #     print(" download_zipped_csv_galaxy_cb():  self.p is NOT None; just return!")
-        # except:
-        #     self.message(f"Unable to download {fname}")
-        #     print("Unable to download csv.zip")
-        #     # self.p = None
-        # return
-
-    def download_all_zipped_galaxy_cb(self):
-        # fname = "/opt/pcstudio/all_output.zip"
-        self.show_info_message("This will start a job that copies a zip file of all output/* to the Galaxy History. You can download it from there once it completes. If you have a lot of output files from your simulation, it may take a while to complete, but it runs in the background and will not affect your ability to continue using the Studio.")
-        fname = "all_output.zip"
-        print("download_all_zipped_galaxy_cb():  cwd= ",os.getcwd())
-        try:
-            # file_str = "/opt/pcstudio/output/*.csv"
-            file_str = "output/*"
-            file_str = os.path.join(os.getcwd(), file_str)
-            print('-------- download_all_zipped_galaxy_cb(): zip up all ',file_str)
-            # fname = "/opt/pcstudio/output/all_csv.zip"
-            with zipfile.ZipFile(fname, 'w') as myzip:
-                # all_files = glob.glob(file_str)
-                # print("all_files = ",all_files)
-                for f in glob.glob(file_str):
-                    myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename 
-        except:
-            self.show_error_message(f"Error zipping all output/*")
-            return
-
-        try:
-            put(fname)
-            # print("dummy put")
-        except:
-            self.show_error_message(f"Error: put({fname})")
-
     def download_config_cb(self):
         if self.nanohub_flag:
             try:
@@ -1471,6 +1381,71 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
         return
 
     #-----------------------------------------------------------------
+    # functions for Galaxy
+    def download_config_galaxy_cb(self):
+        # put("config/PhysiCell_settings.xml")
+        #     put( args.filepath, file_type=args.filetype, history_id=args.history_id )
+        # fname = "/opt/pcstudio/config/PhysiCell_settings.xml"
+        fname = self.current_xml_file 
+        self.show_info_message("This will start a job that copies your current model's config file to the Galaxy History. You can download it from there once it completes.")
+        try:
+            put(fname)
+            # print("dummy put...")
+        except:
+            self.show_error_message(f"Error: put({fname})")
+        return
+
+    def download_zipped_csv_galaxy_cb(self):
+        # fname = "/opt/pcstudio/all_csv.zip"
+        self.show_info_message("This will start a job that copies a zip file of all output/*.csv to the Galaxy History. You can download it from there once it completes.")
+        fname = "all_csv.zip"
+        print("download_zipped_csv_galaxy_cb():  cwd= ",os.getcwd())
+        try:
+            # file_str = "/opt/pcstudio/output/*.csv"
+            file_str = "output/*.csv"
+            file_str = os.path.join(os.getcwd(), file_str)
+            print('-------- download_zipped_csv_galaxy_cb(): zip up all ',file_str)
+            # fname = "/opt/pcstudio/output/all_csv.zip"
+            with zipfile.ZipFile(fname, 'w') as myzip:
+                # csv_files = glob.glob(file_str)
+                # print("csv_files = ",csv_files)
+                for f in glob.glob(file_str):
+                    myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename 
+        except:
+            self.show_error_message(f"Error zipping all output/*.csv")
+            return
+
+        try:
+            put(fname)
+            # print("dummy put...")
+        except:
+            self.show_error_message(f"Error: put({fname})")
+
+    def download_all_zipped_galaxy_cb(self):
+        # fname = "/opt/pcstudio/all_output.zip"
+        self.show_info_message("This will start a job that copies a zip file of all output/* to the Galaxy History. You can download it from there once it completes. If you have a lot of output files from your simulation, it may take a while to complete, but it runs in the background and will not affect your ability to continue using the Studio.")
+        fname = "all_output.zip"
+        print("download_all_zipped_galaxy_cb():  cwd= ",os.getcwd())
+        try:
+            # file_str = "/opt/pcstudio/output/*.csv"
+            file_str = "output/*"
+            file_str = os.path.join(os.getcwd(), file_str)
+            print('-------- download_all_zipped_galaxy_cb(): zip up all ',file_str)
+            # fname = "/opt/pcstudio/output/all_csv.zip"
+            with zipfile.ZipFile(fname, 'w') as myzip:
+                # all_files = glob.glob(file_str)
+                # print("all_files = ",all_files)
+                for f in glob.glob(file_str):
+                    myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename 
+        except:
+            self.show_error_message(f"Error zipping all output/*")
+            return
+
+        try:
+            put(fname)
+            # print("dummy put")
+        except:
+            self.show_error_message(f"Error: put({fname})")
 
 studio_app = None
 def main():
@@ -1483,6 +1458,7 @@ def main():
     rules_flag = True
     skip_validate_flag = False
     nanohub_flag = False
+    galaxy_flag = False
     is_movable_flag = False
     pytest_flag = False
     biwt_flag = False
@@ -1492,9 +1468,9 @@ def main():
         parser.add_argument("-b ", "--bare", "--basic", help="no plotting, etc ", action="store_true")
         parser.add_argument("-3 ", "--three", "--3D", help="assume a 3D model", action="store_true")
         parser.add_argument("-t ", "--tensor",  help="for 3D ellipsoid cells", action="store_true")
-        parser.add_argument("-r ", "--rules", "--Rules", help="display Rules tab" , action="store_true")
         parser.add_argument("-x ", "--skip_validate", help="do not attempt to validate the config (.xml) file" , action="store_true")
         parser.add_argument("--nanohub", help="run as if on nanoHUB", action="store_true")
+        parser.add_argument("--galaxy", help="run as if on Galaxy", action="store_true")
         # parser.add_argument("--is_movable", help="checkbox for mechanics is_movable", action="store_true")
         parser.add_argument("-c ", "--config", type=str, help="config file (.xml)")
         parser.add_argument("-e ", "--exec", type=str, help="executable model")
@@ -1511,10 +1487,6 @@ def main():
         print("unknown=",unknown)
         if unknown:
             print("len(unknown)= ",len(unknown))
-            # if unknown[0] == "--rules" and len(unknown)==1:
-            #     print("studio.py: setting rules_flag = True")
-            #     rules_flag = True
-            # else:
             print("Invalid argument(s): ",unknown)
             print("Use '--help' to see options.")
             sys.exit(-1)
@@ -1532,12 +1504,12 @@ def main():
             studio_flag = False
             model3D_flag = False
             # print("done with args.studio")
-        if args.rules:
-            logging.debug(f'studio.py: Show Rules tab')
-            rules_flag = True
         if args.nanohub:
             logging.debug(f'studio.py: nanoHUB mode')
             nanohub_flag = True
+        if args.galaxy:
+            logging.debug(f'studio.py: Galaxy mode')
+            galaxy_flag = True
         # if args.is_movable:
         #     is_movable_flag = True
         if args.skip_validate:
@@ -1633,7 +1605,7 @@ def main():
     # studio_app.setStyleSheet("QLineEdit { background-color: white };QPushButton { background-color: green } ")  # doesn't seem to always work, forcing us to take different approach in, e.g., Cell Types sub-tabs
 
 
-    # rules_flag = False
+    rules_flag = True
     if rules_flag:
         try:
             from rules_tab import Rules
@@ -1648,8 +1620,7 @@ def main():
             sys.exit(1)
             # print("Warning: Rules module not found.\n")
 
-    # print("calling PhysiCellXMLCreator with rules_flag= ",rules_flag)
-    ex = PhysiCellXMLCreator(config_file, studio_flag, skip_validate_flag, rules_flag, model3D_flag, tensor_flag, exec_file, nanohub_flag, is_movable_flag, pytest_flag, biwt_flag
+    ex = PhysiCellXMLCreator(config_file, studio_flag, skip_validate_flag, rules_flag, model3D_flag, tensor_flag, exec_file, nanohub_flag, galaxy_flag, is_movable_flag, pytest_flag, biwt_flag
                              )
     print("size=",ex.size())
 

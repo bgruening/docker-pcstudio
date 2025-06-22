@@ -37,9 +37,9 @@ from pyMCDS import pyMCDS
 #----------------------------------------------------------------------
 class Vis(VisBase, QWidget):
 
-    def __init__(self, studio_flag, rules_flag, nanohub_flag, config_tab, microenv_tab, celldef_tab, user_params_tab, rules_tab, ics_tab, run_tab, model3D_flag, tensor_flag, ecm_flag):
+    def __init__(self, studio_flag, rules_flag, nanohub_flag, config_tab, microenv_tab, celldef_tab, user_params_tab, rules_tab, ics_tab, run_tab, model3D_flag, tensor_flag, ecm_flag, galaxy_flag):
 
-        super(Vis,self).__init__(studio_flag=studio_flag, rules_flag=rules_flag,  nanohub_flag=nanohub_flag, config_tab=config_tab, microenv_tab=microenv_tab, celldef_tab=celldef_tab, user_params_tab=user_params_tab, rules_tab=rules_tab, ics_tab=ics_tab, run_tab=run_tab, model3D_flag=model3D_flag,tensor_flag=tensor_flag, ecm_flag=ecm_flag)
+        super(Vis,self).__init__(studio_flag=studio_flag, rules_flag=rules_flag,  nanohub_flag=nanohub_flag, config_tab=config_tab, microenv_tab=microenv_tab, celldef_tab=celldef_tab, user_params_tab=user_params_tab, rules_tab=rules_tab, ics_tab=ics_tab, run_tab=run_tab, model3D_flag=model3D_flag,tensor_flag=tensor_flag, ecm_flag=ecm_flag, galaxy_flag=galaxy_flag)
 
         self.figure = None
 
@@ -547,10 +547,13 @@ class Vis(VisBase, QWidget):
         # self.canvas.update()
         # self.canvas.draw()
 
-        if self.save_png:
-            self.png_frame += 1
-            png_file = os.path.join(self.output_dir, f"frame{self.png_frame:04d}.png")
-            print("---->  ", png_file)
+        if self.save_frame:
+            if self.save_frame_filetype != '.png':
+                print(f"\n\n----WARNING----\n\t3D printing not supported for {self.save_frame_filetype} filetype. Using .png instead.\n")
+                self.save_frame_filetype = '.png'
+            self.frame_ind += 1
+            frame_file = os.path.join(self.output_dir, f"frame{self.frame_ind:04d}{self.save_frame_filetype}")
+            print("---->  ", frame_file)
             windowto_image_filter = vtkWindowToImageFilter()
             windowto_image_filter.SetInput(self.vtkWidget.GetRenderWindow())
             windowto_image_filter.SetScale(1)  # image quality
@@ -563,7 +566,7 @@ class Vis(VisBase, QWidget):
                 windowto_image_filter.ReadFrontBufferOff()
                 windowto_image_filter.Update()
 
-            self.png_writer.SetFileName(png_file)
+            self.png_writer.SetFileName(frame_file)
             self.png_writer.SetInputConnection(windowto_image_filter.GetOutputPort())
             self.png_writer.Write()
 
@@ -1913,8 +1916,9 @@ class Vis(VisBase, QWidget):
 
 
             # TODO: Hard-coded voxel_size, plus assuming centered at origin!
-            # voxel_size = 20   # rwh: fix hard-coded
-            voxel_size = 32   # rwh: fix hard-coded for furkan-transfer-v1.14RC
+            x_voxel_size = mcds.get_mesh_spacing()[0]
+            y_voxel_size = mcds.get_mesh_spacing()[1]
+            z_voxel_size = mcds.get_mesh_spacing()[2]
             # x0 = -(voxel_size * nx) / 2.0
             # y0 = -(voxel_size * ny) / 2.0
             # z0 = -(voxel_size * nz) / 2.0
@@ -1944,7 +1948,7 @@ class Vis(VisBase, QWidget):
                 return
 
             self.substrate_data.SetOrigin( x0, y0, z0 )  # lower-left-front point of domain bounding box
-            self.substrate_data.SetSpacing( voxel_size, voxel_size, voxel_size )
+            self.substrate_data.SetSpacing( x_voxel_size, y_voxel_size, z_voxel_size )
             vmin = 1.e30
             vmax = -vmin
             # for z in range( 0, nz+1 ) :  # if point data, not cell data

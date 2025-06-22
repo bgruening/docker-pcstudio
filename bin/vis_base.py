@@ -307,12 +307,12 @@ class QHLine(QFrame):
 #---------------------------------------------------------------
 class VisBase():
 
-    def __init__(self, studio_flag, rules_flag, nanohub_flag, config_tab, microenv_tab, celldef_tab, user_params_tab, rules_tab, ics_tab, run_tab, model3D_flag, tensor_flag, ecm_flag, **kw):
+    def __init__(self, studio_flag, rules_flag, nanohub_flag, config_tab, microenv_tab, celldef_tab, user_params_tab, rules_tab, ics_tab, run_tab, model3D_flag, tensor_flag, ecm_flag, galaxy_flag, **kw):
         # super().__init__()
         # global self.config_params
         super(VisBase,self).__init__(**kw)
 
-        self.galaxy_flag = True
+
         self.vis_filter_init_flag = True
 
         self.studio_flag = studio_flag 
@@ -324,14 +324,16 @@ class VisBase():
         self.rules_tab = rules_tab
         self.ics_tab = ics_tab
 
-        self.png_frame = 0
-        self.save_png= False
+        self.frame_ind = 0
+        self.save_frame_filetype = '.png'
+        self.save_frame= False
 
         # self.vis2D = True
         self.model3D_flag = model3D_flag 
         print("--- VisBase: model3D_flag=",model3D_flag)
         self.tensor_flag = tensor_flag 
         self.ecm_flag = ecm_flag 
+        self.galaxy_flag = galaxy_flag 
 
         if not self.model3D_flag:
             # self.discrete_cell_scalars = ['cell_type', 'cycle_model', 'current_phase','is_motile','current_death_model','dead', 'number_of_nuclei']
@@ -488,7 +490,7 @@ class VisBase():
         self.fix_cmap_flag = False
         self.cells_edge_checked_flag = True
 
-        self.attachments_checked_flag = False
+        self.graph_display_type = 'NONE'
 
         self.contour_mesh = True
         self.contour_lines = False
