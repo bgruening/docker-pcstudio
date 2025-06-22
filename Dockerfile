@@ -60,6 +60,7 @@ COPY ./bin/images/* /opt/pcstudio/bin/images/
 COPY ./bin/icon/* /opt/pcstudio/bin/icon/
 COPY ./config/* /opt/pcstudio/config/
 COPY ./project /opt/pcstudio/
+COPY ./omp_hello /opt/pcstudio/
 COPY ./VERSION.txt /opt/pcstudio/
 RUN chmod -R 777 /opt/pcstudio
 
