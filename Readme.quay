@@ -1,4 +1,9 @@
  docker build -t  physicell/pcstudio .
  docker tag physicell/pcstudio quay.io/physicell/pcstudio:0.1
+ docker tag physicell/pcstudio quay.io/physicell/pcstudio:0.2
+ docker tag physicell/pcstudio quay.io/physicell/pcstudio:0.3
+... whatever tag is latest
  docker images
  docker push quay.io/physicell/pcstudio:0.1
+ docker push quay.io/physicell/pcstudio:0.2
+ docker push quay.io/physicell/pcstudio:0.3
