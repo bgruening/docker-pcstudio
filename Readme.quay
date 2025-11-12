@@ -2,8 +2,18 @@
  docker tag physicell/pcstudio quay.io/physicell/pcstudio:0.1
  docker tag physicell/pcstudio quay.io/physicell/pcstudio:0.2
  docker tag physicell/pcstudio quay.io/physicell/pcstudio:0.3
+ docker tag physicell/pcstudio quay.io/physicell/pcstudio:latest
 ... whatever tag is latest
  docker images
+
+ optionally, test it locally:
+ docker run --rm -p 5800:5800 -p 5900:5900 physicell/pcstudio
+ then: http://localhost:5800/
+
  docker push quay.io/physicell/pcstudio:0.1
  docker push quay.io/physicell/pcstudio:0.2
  docker push quay.io/physicell/pcstudio:0.3
+ docker push quay.io/physicell/pcstudio:latest
+
+confirm updated:
+https://quay.io/repository/physicell/pcstudio?tab=tags 
