@@ -23,7 +23,7 @@
     </overall>
 
     <parallel>
-        <omp_num_threads>1</omp_num_threads>
+        <omp_num_threads>4</omp_num_threads>
     </parallel>
 
     <save>
@@ -258,7 +258,7 @@
         <rulesets>
             <ruleset protocol="CBHG" version="3.0" format="csv" enabled="true">
                 <folder>./config</folder>
-                <filename>rules0.csv</filename>
+                <filename>cell_rules.csv</filename>
             </ruleset>
         </rulesets>
         <settings />
