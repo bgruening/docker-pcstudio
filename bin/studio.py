@@ -574,23 +574,26 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
             # model_menu.addAction("biorobots", self.biorobots_cb)
             # model_menu.addAction("tumor_immune", self.tumor_immune_cb)
 
-            file_menu.addAction("Open (upload) mymodel.xml", self.upload_config_cb)
-            file_menu.addAction("Open (upload) myrules.csv", self.upload_rules_cb)
-            file_menu.addAction("Open (upload) mycells.csv", self.upload_cells_cb)
+#            file_menu.addAction("Open (upload) mymodel.xml", self.upload_config_cb)
+#            file_menu.addAction("Open (upload) myrules.csv", self.upload_rules_cb)
+#            file_menu.addAction("Open (upload) mycells.csv", self.upload_cells_cb)
 
-            self.download_menu = file_menu.addMenu('Download')
-            self.download_config_item = self.download_menu.addAction("Download config.xml", self.download_config_cb)
-            self.download_csv_item = self.download_menu.addAction("Download cells,rules (.csv) data", self.download_csv_cb)
-            self.download_rules_item = self.download_menu.addAction("Download rules.txt", self.download_rules_cb)
-            self.download_output_item = self.download_menu.addAction("Download all output data", self.download_output_cb)
+#            self.download_menu = file_menu.addMenu('Download')
+#            self.download_config_item = self.download_menu.addAction("Download config.xml", self.download_config_cb)
+#            self.download_csv_item = self.download_menu.addAction("Download cells,rules (.csv) data", self.download_csv_cb)
+#            self.download_rules_item = self.download_menu.addAction("Download rules.txt", self.download_rules_cb)
+#            self.download_output_item = self.download_menu.addAction("Download all output data", self.download_output_cb)
 
         #--------------
         else:
             self.download_menu = None
 
-            file_menu.addAction("Open", self.open_as_cb, QtGui.QKeySequence('Ctrl+o'))
-            file_menu.addAction("Save as", self.save_as_cb)
-            file_menu.addAction("Save", self.save_cb, QtGui.QKeySequence('Ctrl+s'))
+            if not self.galaxy_flag:
+                file_menu.addAction("Open", self.open_as_cb, QtGui.QKeySequence('Ctrl+o'))
+                file_menu.addAction("Save as", self.save_as_cb)
+                file_menu.addAction("Save", self.save_cb, QtGui.QKeySequence('Ctrl+s'))
+            else:
+                file_menu.addAction("Save project", self.save_project)
             #------
             if not self.galaxy_flag:
                 export_menu = file_menu.addMenu("Export")
@@ -607,7 +610,8 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
                 file_menu.addAction("Save user project", self.save_user_proj_cb)
                 file_menu.addAction("Load user project", self.load_user_proj_cb)
 
-        if self.galaxy_flag:
+#        if self.galaxy_flag:
+        if False:
             file_menu.addAction("get from History", self.get_galaxy_history_cb)
             self.download_menu = file_menu.addMenu('put on History')
             self.download_config_item = self.download_menu.addAction("current config .xml", self.download_config_galaxy_cb)
@@ -634,6 +638,14 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
                 if not self.nanohub_flag:
                     vis2D_model_summary_act = view_menu.addAction("Model summary", self.model_summary_cb)
 
+        if self.galaxy_flag:
+            misc_menu = menubar.addMenu('&Misc')
+            misc_menu.addAction("get from History", self.get_galaxy_history_cb)
+
+            self.download_menu = misc_menu.addMenu('put on History')
+            self.download_config_item = self.download_menu.addAction("current config .xml", self.download_config_galaxy_cb)
+            self.download_zipped_csv_item = self.download_menu.addAction("all_csv.zip", self.download_zipped_csv_galaxy_cb)
+            self.download_all_zipped_item = self.download_menu.addAction("all_output.zip", self.download_all_zipped_galaxy_cb)
 
         if not self.nanohub_flag and not self.galaxy_flag:
             action_menu = menubar.addMenu('&Action')
@@ -843,6 +855,46 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
         except CellDefException as e:
             self.show_error_message(str(e) + " : save_as_cb(): Error: Please finish the definition before saving.")
 
+
+    def save_project(self):
+        self.download_config_galaxy_cb()
+        """
+        self.celldef_tab.check_valid_cell_defs()
+
+        if not self.user_params_tab.validate_utable():
+            return
+
+        try:
+            # self.celldef_tab.config_path = self.current_save_file
+            self.celldef_tab.config_path = self.current_xml_file
+
+            self.config_file = self.current_xml_file
+
+            # self.config_tab.fill_xml()
+            # self.microenv_tab.fill_xml()
+            # self.celldef_tab.fill_xml()
+            # self.user_params_tab.fill_xml()
+            # if self.rules_flag:
+            #     self.rules_tab.fill_xml()
+
+            if not self.update_xml_from_gui():
+                return
+
+#            self.setWindowTitle(self.title_prefix + self.current_xml_file)
+
+            # print("\n\n ===================================")
+            # print("studio.py:  save_cb: writing to: ",out_file)
+            print("studio.py:  save_cb: writing to: ",self.current_xml_file)
+
+            # self.tree.write(out_file)  # originally
+            self.tree.write(self.current_xml_file)
+            pretty_print(self.current_xml_file, self.current_xml_file)
+
+
+        except CellDefException as e:
+            self.show_error_message(str(e) + " : save_cb(): Error: Please finish the definition before saving.")
+
+        """
 
     def save_cb(self):
         self.celldef_tab.check_valid_cell_defs()
