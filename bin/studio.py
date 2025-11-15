@@ -857,7 +857,7 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
 
 
     def save_project(self):
-        self.download_config_galaxy_cb()
+        self.download_project_galaxy_cb()
         """
         self.celldef_tab.check_valid_cell_defs()
 
@@ -1518,6 +1518,28 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
 
     #-----------------------------------------------------------------
     # functions for Galaxy
+    def download_project_galaxy_cb(self):
+        fname = "project.zip"
+        file_str = "config/*.csv"
+        file_str = os.path.join(os.getcwd(), file_str)
+        print('-------- download_zipped_csv_galaxy_cb(): zip up all ',file_str)
+        self.show_info_message("This will start a job that bundles your current model's config file, its cells and substrates ICs, and its rules, and copies that .zip file to the Galaxy History. You can download it from there once it completes.")
+        try:
+            with zipfile.ZipFile(fname, 'w') as myzip:
+                # myzip.write(self.current_xml_file)
+                myzip.write(self.current_xml_file, os.path.basename(self.current_xml_file))
+                for f in glob.glob(file_str):
+                    myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename 
+                # csv_files = glob.glob(file_str)
+                # print("csv_files = ",csv_files)
+                # for f in glob.glob(file_str):
+                    # myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename 
+            put(fname)
+            # print("dummy put...")
+        except:
+            self.show_error_message(f"Error: put({fname})")
+        return
+
     def download_config_galaxy_cb(self):
         # put("config/PhysiCell_settings.xml")
         #     put( args.filepath, file_type=args.filetype, history_id=args.history_id )
