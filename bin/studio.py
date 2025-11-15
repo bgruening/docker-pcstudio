@@ -593,6 +593,7 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
                 file_menu.addAction("Save as", self.save_as_cb)
                 file_menu.addAction("Save", self.save_cb, QtGui.QKeySequence('Ctrl+s'))
             else:
+                file_menu.addAction("Open", self.open_as_cb, QtGui.QKeySequence('Ctrl+o'))
                 file_menu.addAction("Save project", self.save_project)
             #------
             if not self.galaxy_flag:
