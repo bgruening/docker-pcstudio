@@ -594,7 +594,8 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
                 file_menu.addAction("Save", self.save_cb, QtGui.QKeySequence('Ctrl+s'))
             else:
                 file_menu.addAction("Open", self.open_as_cb, QtGui.QKeySequence('Ctrl+o'))
-                file_menu.addAction("Save project", self.save_project)
+                file_menu.addAction("Save project", self.save_project_galaxy)
+                file_menu.addAction("Load project", self.load_project_galaxy)
             #------
             if not self.galaxy_flag:
                 export_menu = file_menu.addMenu("Export")
@@ -856,46 +857,6 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
         except CellDefException as e:
             self.show_error_message(str(e) + " : save_as_cb(): Error: Please finish the definition before saving.")
 
-
-    def save_project(self):
-        self.download_project_galaxy_cb()
-        """
-        self.celldef_tab.check_valid_cell_defs()
-
-        if not self.user_params_tab.validate_utable():
-            return
-
-        try:
-            # self.celldef_tab.config_path = self.current_save_file
-            self.celldef_tab.config_path = self.current_xml_file
-
-            self.config_file = self.current_xml_file
-
-            # self.config_tab.fill_xml()
-            # self.microenv_tab.fill_xml()
-            # self.celldef_tab.fill_xml()
-            # self.user_params_tab.fill_xml()
-            # if self.rules_flag:
-            #     self.rules_tab.fill_xml()
-
-            if not self.update_xml_from_gui():
-                return
-
-#            self.setWindowTitle(self.title_prefix + self.current_xml_file)
-
-            # print("\n\n ===================================")
-            # print("studio.py:  save_cb: writing to: ",out_file)
-            print("studio.py:  save_cb: writing to: ",self.current_xml_file)
-
-            # self.tree.write(out_file)  # originally
-            self.tree.write(self.current_xml_file)
-            pretty_print(self.current_xml_file, self.current_xml_file)
-
-
-        except CellDefException as e:
-            self.show_error_message(str(e) + " : save_cb(): Error: Please finish the definition before saving.")
-
-        """
 
     def save_cb(self):
         self.celldef_tab.check_valid_cell_defs()
@@ -1519,7 +1480,7 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
 
     #-----------------------------------------------------------------
     # functions for Galaxy
-    def download_project_galaxy_cb(self):
+    def save_project_galaxy(self):
         fname = "project.zip"
         file_str = "config/*.csv"
         file_str = os.path.join(os.getcwd(), file_str)
@@ -1539,6 +1500,9 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
             # print("dummy put...")
         except:
             self.show_error_message(f"Error: put({fname})")
+        return
+
+    def load_project_galaxy(self):
         return
 
     def download_config_galaxy_cb(self):
