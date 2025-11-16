@@ -1,4 +1,5 @@
 import os
+import zipfile
 from pathlib import Path
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QFrame,QApplication,QWidget,QTabWidget,QFormLayout,QLineEdit, QGroupBox, QHBoxLayout,QVBoxLayout,QRadioButton,QLabel,QCheckBox,QComboBox,QScrollArea,  QMainWindow,QGridLayout, QPushButton, QFileDialog, QMessageBox, QStackedWidget, QSplitter, QScrollArea
@@ -120,12 +121,12 @@ class GalaxyHistoryWindow(QWidget):
 
 
     #--------
-    def show_info_message(self, message):
-        msgBox = QMessageBox()
-        msgBox.setIcon(QMessageBox.Information)
-        msgBox.setText(message)
-        msgBox.setStandardButtons(QMessageBox.Ok)
-        msgBox.exec_()
+    # def show_info_message(self, message):
+    #     msgBox = QMessageBox()
+    #     msgBox.setIcon(QMessageBox.Information)
+    #     msgBox.setText(message)
+    #     msgBox.setStandardButtons(QMessageBox.Ok)
+    #     msgBox.exec_()
 
     def get_file_cb(self,sval):
         self.file_id = int(self.file_id_w.text())
@@ -162,5 +163,119 @@ class GalaxyHistoryWindow(QWidget):
 
     #----------
     def close_galaxy_history_cb(self):
+        self.close()
+
+#----------------------------------------------------------------
+class LoadProjectWindow(QWidget):
+    # def __init__(self, output_dir):
+    def __init__(self):   # we use vis_tab for some of the methods called
+        super().__init__()
+
+        stylesheet = """ 
+            QPushButton{ border: 1px solid; border-color: rgb(145, 200, 145); border-radius: 1px;  background-color: lightgreen; color: black; width: 64px; padding-right: 8px; padding-left: 8px; padding-top: 3px; padding-bottom: 3px; } 
+
+            """
+
+        # self.output_dir = output_dir
+        self.file_id = 0
+
+        self.setStyleSheet(stylesheet)
+        
+        #-------------------------------------------
+        self.scroll = QScrollArea()  # might contain centralWidget
+
+        self.vbox = QVBoxLayout()
+        glayout = QGridLayout()
+
+        # hbox = QHBoxLayout()
+        self.vbox.addLayout(glayout)
+
+        #-------------------------------------------
+        idx_row = 0
+        self.get_file_button = QPushButton("Get project.zip on History with ID=")
+        self.get_file_button.setFixedWidth(230)
+        self.get_file_button.setEnabled(True)
+        self.get_file_button.setStyleSheet("background-color: lightgreen;")
+        self.get_file_button.clicked.connect(self.get_project_cb)
+        glayout.addWidget(self.get_file_button, idx_row,0,1,2) # w, row, column, rowspan, colspan
+
+        self.file_id_w = QLineEdit("0")  # str(self.vis_tab.axes_x_center))
+        self.file_id_w.setEnabled(True)
+        self.file_id_w.setFixedWidth(70)
+        self.file_id_w.setValidator(QIntValidator())
+        self.file_id_w.textChanged.connect(self.file_id_changed)
+        glayout.addWidget(self.file_id_w , idx_row,2, 1,1) # w, row, column, rowspan, colspan
+        #--------------------------------
+
+        idx_row += 1
+        msg = "Select the ID value of a 'project.zip' on the\nGalaxy History then press the Get button above.\nThis will unzip those files into your /config directory."
+        # glayout.addWidget(QLabel(f"pwd: {Path.cwd()}"), idx_row,0,1,2) # w, row, column, rowspan, colspan
+        glayout.addWidget(QLabel(msg), idx_row,0,1,3) # w, row, column, rowspan, colspan
+
+        #----------
+        self.close_button = QPushButton("Close")
+        self.close_button.setStyleSheet("background-color: lightgreen;")
+        # self.close_button.setFixedWidth(150)
+        self.close_button.clicked.connect(self.close_load_project)
+
+        self.scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.scroll.setWidgetResizable(True)
+
+        self.vbox.addWidget(self.close_button)
+        # self.layout.setStretch(0,1000)
+
+        self.setLayout(self.vbox)
+        self.resize(190, 200)   # try to fix the size
+        # self.resize(250, 220)   # try to fix the size
+
+
+    #--------
+    def show_info_message(self, message):
+        msgBox = QMessageBox()
+        msgBox.setIcon(QMessageBox.Information)
+        msgBox.setText(message)
+        msgBox.setStandardButtons(QMessageBox.Ok)
+        msgBox.exec_()
+
+    def get_project_cb(self,sval):
+        self.file_id = int(self.file_id_w.text())
+        try:
+            msgBox = QMessageBox()
+            msgBox.setText(f'Copying the requested data from the Galaxy History')
+            msgBox.setStandardButtons(QMessageBox.Ok)
+            returnValue = msgBox.exec()
+            # fid = find_matching_history_ids(self.file_id)
+            # get(fid)
+            get(self.file_id)   #rwh: needs to be named project.zip ?!
+            # print("dummy get")
+            # os.chdir("config")
+            # os.chdir("..")
+            with zipfile.ZipFile("project.zip", 'r') as zip_ref:
+                zip_ref.extractall("config")
+        except:
+            print("There was a problem getting or unzipping the file")
+            msgBox = QMessageBox()
+            msgBox.setText(f'There was a problem getting or unzipping file with History ID {self.file_id}. Perhaps you got it previously.')
+            msgBox.setStandardButtons(QMessageBox.Ok)
+            returnValue = msgBox.exec()
+
+    def file_id_changed(self,sval):
+        try:
+            self.file_id = int(sval)
+        except:
+            pass
+
+    # def save_png_cb(self):
+    #     self.vis_tab.png_frame = 0
+    #     self.vis_tab.save_png = self.save_png_checkbox.isChecked()
+        
+    # def show_files_cb(self):
+    #     dir_files = os.listdir(self.relative_path.text())
+    #     self.dir_files.setText(str(dir_files))
+    #     return
+
+    #----------
+    def close_load_project(self):
         self.close()
 

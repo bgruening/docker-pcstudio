@@ -51,7 +51,7 @@ from run_tab import RunModel
 from settings import StudioSettings
 # from legend_tab import Legend 
 
-from galaxy_history import GalaxyHistoryWindow
+from galaxy_history import GalaxyHistoryWindow, LoadProjectWindow
 try:
     from galaxy_ie_helpers import put, find_matching_history_ids, get
 except:
@@ -532,6 +532,12 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
         print("studio.py: filterUI_cb")
         self.vis_tab.filterUI_cb()
 
+    def load_project_galaxy_history_cb(self):
+        self.project_historyUI = LoadProjectWindow()
+        # hack to bring to foreground
+        self.project_historyUI.hide()
+        self.project_historyUI.show()
+
     def get_galaxy_history_cb(self):
         self.galaxy_historyUI = GalaxyHistoryWindow()
         # hack to bring to foreground
@@ -595,7 +601,7 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
             else:
                 file_menu.addAction("Open", self.open_as_cb, QtGui.QKeySequence('Ctrl+o'))
                 file_menu.addAction("Save project", self.save_project_galaxy)
-                file_menu.addAction("Load project", self.load_project_galaxy)
+                file_menu.addAction("Load project", self.load_project_galaxy_history_cb)
             #------
             if not self.galaxy_flag:
                 export_menu = file_menu.addMenu("Export")
@@ -611,14 +617,6 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
                 file_menu.addSeparator()
                 file_menu.addAction("Save user project", self.save_user_proj_cb)
                 file_menu.addAction("Load user project", self.load_user_proj_cb)
-
-#        if self.galaxy_flag:
-        if False:
-            file_menu.addAction("get from History", self.get_galaxy_history_cb)
-            self.download_menu = file_menu.addMenu('put on History')
-            self.download_config_item = self.download_menu.addAction("current config .xml", self.download_config_galaxy_cb)
-            self.download_zipped_csv_item = self.download_menu.addAction("all_csv.zip", self.download_zipped_csv_galaxy_cb)
-            self.download_all_zipped_item = self.download_menu.addAction("all_output.zip", self.download_all_zipped_galaxy_cb)
 
         #-------------------------
         if self.model3D_flag:
@@ -1485,7 +1483,15 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
         file_str = "config/*.csv"
         file_str = os.path.join(os.getcwd(), file_str)
         print('-------- download_zipped_csv_galaxy_cb(): zip up all ',file_str)
-        self.show_info_message("This will start a job that bundles your current model's config file, its cells and substrates ICs, and its rules, and copies that .zip file to the Galaxy History. You can download it from there once it completes.")
+
+        msgBox = QMessageBox()
+        msgBox.setText("This will start a job that bundles your current model's config file, its cells and substrates ICs, and its rules, and creates and copies 'project.zip' to the Galaxy History. You can download it from there once it completes.")
+        msgBox.setIcon(QMessageBox.Information)
+        msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        returnValue = msgBox.exec()
+        if returnValue == QMessageBox.Cancel:
+            return
+
         try:
             with zipfile.ZipFile(fname, 'w') as myzip:
                 # myzip.write(self.current_xml_file)
@@ -1502,8 +1508,9 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
             self.show_error_message(f"Error: put({fname})")
         return
 
-    def load_project_galaxy(self):
-        return
+    # def load_project_galaxy(self):
+    #     self.load_project_galaxy_history_cb()
+    #     return
 
     def download_config_galaxy_cb(self):
         # put("config/PhysiCell_settings.xml")
