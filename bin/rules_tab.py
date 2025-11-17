@@ -29,7 +29,7 @@ import pandas as pd
 
 from multivariate_rules import Window_plot_rules
 from studio_classes import ExtendedCombo, HoverWarning, QVLine, QLineEdit_custom, HoverQuestion
-from studio_functions import show_studio_warning_window
+from studio_functions import show_studio_warning_window, style_sheet_template
 
 class RulesPlotWindow(QWidget):
     def __init__(self):
@@ -320,6 +320,7 @@ class Rules(QWidget):
 
         self.rules_folder = QLineEdit()
         self.rules_folder.setPlaceholderText("folder")
+        self.rules_folder.setStyleSheet(style_sheet_template(QLineEdit))
         if self.nanohub_flag:
             self.rules_folder.setEnabled(False)
         # self.rules_folder.setFixedWidth(200)

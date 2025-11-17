@@ -221,6 +221,9 @@ class PhysiCellXMLCreator(QWidget):
         self.config_tab_index = 0
         self.config_tab.xml_root = self.xml_root
         self.config_tab.fill_gui()
+        if self.nanohub_flag or self.galaxy_flag:
+            self.config_tab.folder.setEnabled(False)
+            self.config_tab.csv_folder.setEnabled(False)
 
         # Trying/failing to force the proper display of (default) checkboxes
         self.config_tab.save_svg.update()
@@ -323,6 +326,8 @@ class PhysiCellXMLCreator(QWidget):
 
             if self.nanohub_flag:
                 self.rules_tab.rules_folder.setText(self.absolute_data_dir)
+            if self.galaxy_flag:
+                self.rules_tab.rules_folder.setEnabled(False)
 
         if self.studio_flag:
             logging.debug(f'studio.py: creating ICs, Run, and Plot tabs')
@@ -332,6 +337,11 @@ class PhysiCellXMLCreator(QWidget):
             self.ics_tab.fill_celltype_combobox()
             self.ics_tab.fill_substrate_combobox()
             self.ics_tab.reset_info()
+
+            if self.galaxy_flag:
+                self.ics_tab.csv_folder.setEnabled(False)
+                self.ics_tab.substrate_save_folder.setEnabled(False)
+                self.ics_tab.substrate_save_folder.setPlaceholderText("config")
 
             if self.nanohub_flag:  # rwh - test if works on nanoHUB
                 print("studio.py: ---- TRUE nanohub_flag: updating ics_tab folder")

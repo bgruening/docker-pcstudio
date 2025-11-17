@@ -567,6 +567,7 @@ class ICs(QWidget):
         hbox.addWidget(label)
 
         self.csv_folder = QLineEdit("config")
+        self.csv_folder.setStyleSheet(style_sheet_template(QLineEdit))
         # rx_valid_varname = QtCore.QRegExp("^[a-zA-Z][a-zA-Z0-9_]+$")
         # name_validator = QtGui.QRegExpValidator(rx_valid_varname)
         # self.csv_folder.setValidator(name_validator)
@@ -759,6 +760,7 @@ class ICs(QWidget):
 
         self.substrate_save_folder = QLineEdit()
         self.substrate_save_folder.setPlaceholderText("folder")
+        self.substrate_save_folder.setStyleSheet(style_sheet_template(QLineEdit))
         self.substrate_save_file = QLineEdit_custom()
         csv_validator = QRegExpValidator(QtCore.QRegExp(r'^.+\.csv$'))
         self.substrate_save_file.setValidator(csv_validator)

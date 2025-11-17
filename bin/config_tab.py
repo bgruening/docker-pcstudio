@@ -298,8 +298,7 @@ class Config(StudioTab):
         self.config_tab_layout.addWidget(label, idx_row,0,1,1) # w, row, column, rowspan, colspan
 
         self.folder = QLineEdit()
-        if self.xml_creator.nanohub_flag or self.xml_creator.galaxy_flag:
-            self.folder.setEnabled(False)
+        self.folder.setStyleSheet(style_sheet_template(QLineEdit))
         self.config_tab_layout.addWidget(self.folder, idx_row,1,1,1) # w, row, column, rowspan, colspan
 
         #---------------------------------------------------------------------------
@@ -501,8 +500,6 @@ class Config(StudioTab):
         self.csv_folder = QLineEdit()
         self.csv_folder.setFixedWidth(filename_width)
         self.csv_folder.setStyleSheet(style_sheet_template(QLineEdit))
-        if self.xml_creator.nanohub_flag or self.xml_creator.galaxy_flag:
-            self.folder.setEnabled(False)
         hbox.addWidget(self.csv_folder)
 
         label = QLabel("file")
@@ -523,6 +520,7 @@ class Config(StudioTab):
         hbox.addStretch()
 
         vbox.addLayout(hbox)
+
 
         #============  Cell behavior flags ================================
         label = QLabelSeparator("Cells' global behaviors")
