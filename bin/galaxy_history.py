@@ -252,7 +252,7 @@ class LoadProjectWindow(QWidget):
             # fid = find_matching_history_ids(self.file_id)
             # get(fid)
             get(self.file_id)
-            from_filename += self.file_id
+            from_filename += str(self.file_id)
             try:
                 print(f"get_project_cb(): attempting to copy {from_filename} to {zip_file}")
                 shutil.copy(from_filename, zip_file)
