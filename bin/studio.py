@@ -1495,7 +1495,7 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
         print('-------- download_zipped_csv_galaxy_cb(): zip up all ',file_str)
 
         msgBox = QMessageBox()
-        msgBox.setText("This will start a job that bundles your current model's config file, its cells and substrates ICs, and its rules, and creates and copies 'project.zip' to the Galaxy History. You can download it from there once it completes.")
+        msgBox.setText(f"This will start a job that bundles your current model's config file, its cells and substrates ICs, and its rules, and creates and copies '{fname}' to the Galaxy History. You can download it from there once it completes.")
         msgBox.setIcon(QMessageBox.Information)
         msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         returnValue = msgBox.exec()
