@@ -90,7 +90,7 @@ def quit_cb():
     studio_app.quit()
 
 class PhysiCellXMLCreator(QWidget):
-    def __init__(self, config_file, studio_flag, skip_validate_flag, rules_flag, model3D_flag, tensor_flag, exec_file, nanohub_flag, galaxy_flag, is_movable_flag, pytest_flag, biwt_flag, parent = None):
+    def __init__(self, config_file, studio_flag, skip_validate_flag, rules_flag, model3D_flag, tensor_flag, exec_file, nanohub_flag, galaxy_flag, fake_galaxy_flag, is_movable_flag, pytest_flag, biwt_flag, parent = None):
         super(PhysiCellXMLCreator, self).__init__(parent)
         if model3D_flag:
             try:
@@ -115,6 +115,7 @@ class PhysiCellXMLCreator(QWidget):
         self.tensor_flag = tensor_flag 
         self.nanohub_flag = nanohub_flag 
         self.galaxy_flag = galaxy_flag 
+        self.fake_galaxy_flag = fake_galaxy_flag 
         self.fix_min_size = not self.galaxy_flag
         self.ecm_flag = False 
         self.pytest_flag = pytest_flag 
@@ -544,12 +545,13 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
 
     def load_project_galaxy_history_cb(self):
         self.project_historyUI = LoadProjectWindow()
+        self.project_historyUI.xml_creator = self
         # hack to bring to foreground
         self.project_historyUI.hide()
         self.project_historyUI.show()
 
     def get_galaxy_history_cb(self):
-        self.galaxy_historyUI = GalaxyHistoryWindow()
+        self.galaxy_historyUI = GalaxyHistoryWindow(self)
         # hack to bring to foreground
         self.galaxy_historyUI.hide()
         self.galaxy_historyUI.show()
@@ -1620,6 +1622,7 @@ def main():
     skip_validate_flag = False
     nanohub_flag = False
     galaxy_flag = False
+    fake_galaxy_flag = False
     is_movable_flag = False
     pytest_flag = False
     biwt_flag = False
@@ -1632,6 +1635,7 @@ def main():
         parser.add_argument("-x ", "--skip_validate", help="do not attempt to validate the config (.xml) file" , action="store_true")
         parser.add_argument("--nanohub", help="run as if on nanoHUB", action="store_true")
         parser.add_argument("--galaxy", help="run as if on Galaxy", action="store_true")
+        parser.add_argument("--fake_galaxy", help="run as if faking Galaxy", action="store_true")
         # parser.add_argument("--is_movable", help="checkbox for mechanics is_movable", action="store_true")
         parser.add_argument("-c ", "--config", type=str, help="config file (.xml)")
         parser.add_argument("-e ", "--exec", type=str, help="executable model")
@@ -1671,6 +1675,9 @@ def main():
         if args.galaxy:
             logging.debug(f'studio.py: Galaxy mode')
             galaxy_flag = True
+        if args.fake_galaxy:
+            logging.debug(f'studio.py: fake Galaxy mode')
+            fake_galaxy_flag = True
         # if args.is_movable:
         #     is_movable_flag = True
         if args.skip_validate:
@@ -1774,7 +1781,7 @@ def main():
             sys.exit(1)
             # print("Warning: Rules module not found.\n")
 
-    ex = PhysiCellXMLCreator(config_file, studio_flag, skip_validate_flag, rules_flag, model3D_flag, tensor_flag, exec_file, nanohub_flag, galaxy_flag, is_movable_flag, pytest_flag, biwt_flag
+    ex = PhysiCellXMLCreator(config_file, studio_flag, skip_validate_flag, rules_flag, model3D_flag, tensor_flag, exec_file, nanohub_flag, galaxy_flag, fake_galaxy_flag, is_movable_flag, pytest_flag, biwt_flag
                              )
     print("size=",ex.size())
 
