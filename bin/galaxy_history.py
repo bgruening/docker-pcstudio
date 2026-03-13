@@ -196,7 +196,7 @@ class LoadProjectWindow(QWidget):
         #-------------------------------------------
         idx_row = 0
         self.load_file_button = QPushButton("Load my_model.zip on History with ID=")
-        self.load_file_button.setFixedWidth(250)
+        self.load_file_button.setFixedWidth(270)
         self.load_file_button.setEnabled(True)
         self.load_file_button.setStyleSheet("background-color: lightgreen;")
         self.load_file_button.clicked.connect(self.load_project_cb)
@@ -275,6 +275,7 @@ class LoadProjectWindow(QWidget):
                 try:
                     print(f"load_project_cb(): attempting to copy {from_filename} to {zip_file}")
                     shutil.copy(from_filename, zip_file)
+                    os.remove(from_filename)   # let's us "Load" it again without an error
                 except:
                     msg = f"Error: unable to copy {from_filename} to {zip_file}"
                     print(msg)
