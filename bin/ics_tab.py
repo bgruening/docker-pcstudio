@@ -823,6 +823,11 @@ class ICs(QWidget):
 
         # self.update_plots()
 
+    def update_colors_list(self):
+        if len(self.celldef_tab.celltypes_list) >= len(self.color_by_celltype):
+            # print("ics_tab: update_colors_list(): exceeded # of colors. Grow it.")
+            self.color_by_celltype.append('white')  # match what's done in PhysiCell
+
     def spacing_cb(self):
         try:  # due to the initial callback
             val = float(self.spacing_w.text())
