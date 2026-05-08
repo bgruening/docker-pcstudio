@@ -40,7 +40,7 @@ class ScrollLabel(QScrollArea):
 
 class GalaxyHistoryWindow(QWidget):
     def __init__(self, xml_creator):
-        super().__init__(xml_creator)
+        super().__init__()
 
         stylesheet = """ 
             QPushButton{ border: 1px solid; border-color: rgb(145, 200, 145); border-radius: 1px;  background-color: lightgreen; color: black; width: 64px; padding-right: 8px; padding-left: 8px; padding-top: 3px; padding-bottom: 3px; } 
@@ -139,8 +139,8 @@ class GalaxyHistoryWindow(QWidget):
             returnValue = msgBox.exec()
             # fid = find_matching_history_ids(self.file_id)
             # get(fid)
-            if not self.xml_creator.fake_galaxy_flag:
-                get(self.file_id)
+            # if not self.xml_creator.fake_galaxy_flag:
+            get(self.file_id)
             # print("dummy get")
         except:
             print("Unable to get the file from History")
@@ -257,7 +257,7 @@ class LoadProjectWindow(QWidget):
             self.xml_creator.show_sample_model()
 
         else:
-            print("load_project_cb(): self.xml_creator.fake_galaxy_flag = ",self.xml_creator.fake_galaxy_flag) 
+            # print("load_project_cb(): self.xml_creator.fake_galaxy_flag = ",self.xml_creator.fake_galaxy_flag) 
             try:
                 msgBox = QMessageBox()
                 msgBox.setText(f'Copying the requested data from the Galaxy History')
@@ -266,7 +266,8 @@ class LoadProjectWindow(QWidget):
                 # fid = find_matching_history_ids(self.file_id)
                 # get(fid)
 
-                if not self.xml_creator.fake_galaxy_flag:
+                # if not self.xml_creator.fake_galaxy_flag:
+                if True:
                     get(self.file_id)    # /import/<string-valued-ID> 
                     from_filename += str(self.file_id)
                 else:
