@@ -330,7 +330,7 @@ class VisBase():
 
         # self.vis2D = True
         self.model3D_flag = model3D_flag 
-        print("--- VisBase: model3D_flag=",model3D_flag)
+        # print("--- VisBase: model3D_flag=",model3D_flag)
         self.tensor_flag = tensor_flag 
         self.ecm_flag = ecm_flag 
         self.galaxy_flag = galaxy_flag 
@@ -1015,7 +1015,7 @@ class VisBase():
         self.legend_svg_button.clicked.connect(self.legend_svg_plot_cb)
         self.vbox.addWidget(self.legend_svg_button)
 
-        if not self.galaxy_flag:
+        if not self.galaxy_flag and not self.model3D_flag:
             self.vbox.addWidget(QHLine())
             hbox = QHBoxLayout()
             self.movie_name_edit = QLineEdit()
@@ -1093,7 +1093,7 @@ class VisBase():
         self.modelSummaryUI.show()
 
     def filterUI_cb(self):
-        print("---- vis_base: filterUI_cb()")
+        # print("---- vis_base: filterUI_cb()")
         # print("    filterUI_cb():  vis_filter_init_flag=",self.vis_filter_init_flag)
         # self.filterUI = FilterUIWindow()
         if self.vis_filter_init_flag:
@@ -1340,7 +1340,7 @@ class VisBase():
                         ctcolor = "gold"
                         # print("  now cell_counts_cb(): ctcolor (1)=",ctcolor)
                 except:
-                    ctcolor = 'C' + str(itype)   # use random colors from matplotlib; rwh TODO: avoid yellow, etc
+                    ctcolor = 'C' + str(itype)   # use random colors from matplotlib; TODO: avoid yellow, etc
                     # print("  cell_counts_cb(): ctcolor (2)=",ctcolor)
                 if 'rgb' in ctcolor:
                     rgb = ctcolor.replace('rgb','')
@@ -1440,12 +1440,12 @@ class VisBase():
     # ------ overridden for 3D (vis3D_tab.py)
     def build_physiboss_info(self):
         config_file = self.run_tab.config_xml_name.text()
-        print("build_physiboss_info():  config_file=",config_file)
+        # print("build_physiboss_info():  config_file=",config_file)
         basename = os.path.basename(config_file)
-        print("build_physiboss_info():  basename=",basename)
+        # print("build_physiboss_info():  basename=",basename)
         # out_config_file = os.path.join(self.output_dir, basename)
         out_config_file = config_file
-        print("build_physiboss_info():  out_config_file=",out_config_file)
+        # print("build_physiboss_info():  out_config_file=",out_config_file)
 
         try:
             self.tree = ET.parse(config_file)
@@ -1504,11 +1504,11 @@ class VisBase():
                                 if value:
                                     list_internal_nodes.append(node)
 
-                    list_output_nodes = list(set(list_nodes).difference(set(list_internal_nodes)))
+                    list_output_nodes = sorted(list(set(list_nodes).difference(set(list_internal_nodes))))
                     self.physiboss_node_dict[cell_def.get("name")] = list_output_nodes
 
           
-        print("physiboss_node_dict :",self.physiboss_node_dict)
+        # print("physiboss_node_dict :",self.physiboss_node_dict)
         if len(self.physiboss_node_dict) > 0:
             self.physiboss_vis_show()
             self.fill_physiboss_cell_types_combobox(list(self.physiboss_node_dict.keys()))
@@ -1561,7 +1561,7 @@ class VisBase():
             self.vbox.addWidget(self.stretch_widget)
 
     def physiboss_vis_hide(self):
-        print("\n--------- physiboss_vis_hide()")
+        # print("\n--------- physiboss_vis_hide()")
 
         if self.physiboss_widgets:
             self.physiboss_widgets = False
@@ -1615,14 +1615,14 @@ class VisBase():
         
         
     def physiboss_state_counts_cb(self):
-        print("---- physiboss_state_counts_cb(): --> window for 2D physiboss state population plots")
+        # print("---- physiboss_state_counts_cb(): --> window for 2D physiboss state population plots")
 
         xml_pattern = self.output_dir + "/" + "output*.xml"
         xml_files = glob.glob(xml_pattern)
 
         num_xml = len(xml_files)
         if num_xml == 0:
-            print("last_plot_cb(): WARNING: no output*.xml files present")
+            # print("last_plot_cb(): WARNING: no output*.xml files present")
             msgBox = QMessageBox()
             msgBox.setIcon(QMessageBox.Information)
             msgBox.setText("Could not find any " + self.output_dir + "/output*.xml")
@@ -1701,7 +1701,7 @@ class VisBase():
         
     #-------------------------------------
     # def reset_xml_root(self):
-    def reset_xml_root(self, config_file):
+    def reset_xml_root_v0(self, config_file):
         self.celldef_tab.reset_to_blank()
 
         self.microenv_tab.param_d.clear()
@@ -1752,11 +1752,11 @@ class VisBase():
         # logging.debug(f'studio: show_sample_model(): self.config_file = {self.config_file}')
         print(f'\nvis_base.py: show_sample_model(): self.config_file = {config_file}')
         self.tree = ET.parse(config_file)
-        print(f'studio: show_sample_model(): self.tree = {self.tree}')
+        print(f'        show_sample_model(): self.tree = {self.tree}')
         if self.studio_flag:
-            self.run_tab.tree = self.tree  #rwh
+            self.run_tab.tree = self.tree  
         # self.xml_root = self.tree.getroot()
-        self.reset_xml_root(config_file)
+        # self.reset_xml_root(config_file)  # comment out 1/18/26
 
         title_prefix = "PhysiCell Model Builder: "
         if self.studio_flag:
@@ -1775,6 +1775,15 @@ class VisBase():
         print(f"output_folder_cb(): old={self.output_dir}")
         self.output_dir = self.output_folder.text()
         print(f"                    new={self.output_dir}")
+
+        msgBox = QMessageBox()
+        msgBox.setIcon(QMessageBox.Information)
+        msgBox.setText("Note: this will let you plot results from a selected output folder, however it will not populate the Studio with the model parameters associated with that output folder. To do the latter, Cancel this and use File -> Open")
+        msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        returnValue = msgBox.exec()
+        if returnValue == QMessageBox.Cancel:
+            return
+
         # filePath = QFileDialog.getOpenFileName(self,'',".")
         dir_path = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
 
@@ -1808,7 +1817,7 @@ class VisBase():
             msgBox.exec()
             return
 
-        self.run_tab.config_xml_name.setText(config_file)
+        # self.run_tab.config_xml_name.setText(config_file)   # comment out 1/18/26
         self.show_sample_model(config_file)
         # self.vis_tab.update_output_dir(self.config_tab.folder.text())
         self.initialize_cell_dict(config_file)
@@ -1897,9 +1906,10 @@ class VisBase():
 
     def update_output_dir(self, dir_path):
         if os.path.isdir(dir_path):
-            print("update_output_dir(): yes, it is a dir path", dir_path)
+            # print("update_output_dir(): yes, it is a dir path", dir_path)
+            pass
         else:
-            print("update_output_dir(): NO, it is NOT a dir path", dir_path)
+            print("vis_base.py: update_output_dir(): this is NOT a dir path: ", dir_path)
         self.output_dir = dir_path
         self.output_folder.setText(dir_path)
 
@@ -2019,7 +2029,7 @@ class VisBase():
         xml_file = "initial.xml"
         full_fname = os.path.join(self.output_dir, xml_file)
         if not os.path.exists(full_fname):
-            print(f"vis_base.py: get_domain_params(): full_fname {full_fname} does not exist, leaving!")
+            # print(f"vis_base.py: get_domain_params(): full_fname {full_fname} does not exist, leaving!")
             return
 
         # print("------------- get_domain_params(): pyMCDS reading info from ",full_fname)
@@ -2040,8 +2050,7 @@ class VisBase():
         # print("get_domain_params(): nx,ny,nz = ",self.nx,self.ny,self.nz)
         # self.substrate_data.SetDimensions( self.nx+1, self.ny+1, self.nz+1 )
 
-        # rwh ??
-        # self.voxel_size = 20   # rwh: fix hard-coded
+        # self.voxel_size = 20   # fix hard-coded
         # self.x0 = -(self.voxel_size * self.nx) / 2.0
         # self.y0 = -(self.voxel_size * self.ny) / 2.0
         # self.z0 = -(self.voxel_size * self.nz) / 2.0
@@ -2052,7 +2061,7 @@ class VisBase():
 
 
     def init_plot_range(self, config_tab):
-        print("vis_base:----- init_plot_range:")
+        # print("vis_base:----- init_plot_range:")
         try:
             # beware of widget callback 
             self.my_xmin.setText(config_tab.xmin.text())
@@ -2064,7 +2073,7 @@ class VisBase():
         except:
             pass
 
-        print("      call get_domain_params()")
+        # print("      call get_domain_params()")
         self.get_domain_params()
 
     def change_plot_range(self):
@@ -2156,7 +2165,7 @@ class VisBase():
         # tree = ET.parse(self.output_dir + "/" + "initial.xml")
         xml_file = Path(self.output_dir, "initial.xml")
         if not os.path.isfile(xml_file):
-            print("vis_tab:reset_model(): Warning: Expecting initial.xml, but does not exist.")
+            # print("vis_base.py: reset_model(): Warning: Expecting initial.xml, but does not exist.")
             # msgBox = QMessageBox()
             # msgBox.setIcon(QMessageBox.Information)
             # msgBox.setText("Did not find 'initial.xml' in the output directory. Will plot a dummy substrate until you run a simulation.")
@@ -2325,7 +2334,7 @@ class VisBase():
 
         if self.cells_svg_rb.isChecked():
             svg_pattern = self.output_dir + "/" + "snapshot*.svg"
-            svg_files = glob.glob(svg_pattern)   # rwh: problematic with celltypes3 due to snapshot_standard*.svg and snapshot<8digits>.svg
+            svg_files = glob.glob(svg_pattern)   # problematic with celltypes3 due to snapshot_standard*.svg and snapshot<8digits>.svg
             svg_files.sort()
             # print('last_plot_cb(): svg_files (after sort)= ',svg_files)
             num_xml = len(xml_files)
@@ -2354,7 +2363,7 @@ class VisBase():
 
         else:   # plotting .mat, not .svg
             self.current_frame = last_xml
-            print('self.current_frame= ',self.current_frame)
+            # print('self.current_frame= ',self.current_frame)
 
         self.update_plots()
 
