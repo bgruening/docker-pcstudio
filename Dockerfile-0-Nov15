@@ -23,9 +23,7 @@ ENV LIBGL_ALWAYS_INDIRECT=1
 
 # some of these pkgs may not be necessary, e.g., openjfx, but leaving in for now
         #  openjfx \
-RUN printf "root:x:0:\nstaff:x:50:\n" > /tmp/.group && \
-    printf "root:x:0:0:root:/root:/bin/bash\n" > /tmp/.passwd && \
-    apt-get update -y && \
+RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
          ca-certificates \
          wget \
@@ -33,21 +31,9 @@ RUN printf "root:x:0:\nstaff:x:50:\n" > /tmp/.group && \
          libgl1 \
          xz-utils \
          nano \
-         libglib2.0-0t64 \
-         libfontconfig1 \
-         libfreetype6 \
-         libdbus-1-3 \
-         libxcb-icccm4 \
-         libxcb-image0 \
-         libxcb-keysyms1 \
-         libxcb-render-util0 \
-         libxcb-render0 \
-         libxcb-shape0 \
-         libxcb-xinerama0 \
-         libxcb-xkb1 \
-         libxkbcommon-x11-0 \
-         libxkbcommon0 \
-         python3 python3-venv python3-pip \
+         qt5dxcb-plugin \
+         qtbase5-dev \
+         python3-full python3-pyqt5 python3-pyqt5.qtsvg python3-pip \
          g++ libomp-dev && \
     rm -rf /var/lib/apt/lists/*
 
