@@ -1,18 +1,40 @@
  docker build -t  physicell/pcstudio .
 ... whatever latest tag is:
- docker tag physicell/pcstudio quay.io/physicell/pcstudio:0.7
+docker tag physicell/pcstudio quay.io/physicell/pcstudio:0.12
+docker push quay.io/physicell/pcstudio:0.12
+docker images
+
 - should I NOT do "latest" - apparently not
  docker tag physicell/pcstudio quay.io/physicell/pcstudio:latest
 ... whatever tag is latest
- docker images
 
  optionally, test it locally:
- docker run --rm -p 5800:5800 -p 5900:5900 physicell/pcstudio
- docker run --rm -p 5800:5800 -p 5900:5900 quay.io/physicell/pcstudio:0.7
+docker run --rm -p 5800:5800 -p 5900:5900 physicell/pcstudio
+docker run --rm -p 5800:5800 -p 5900:5900 quay.io/physicell/pcstudio:0.12
  then: http://localhost:5800/
 
- docker push quay.io/physicell/pcstudio:0.7
-?? docker push quay.io/physicell/pcstudio:latest
 
 confirm updated:
 https://quay.io/repository/physicell/pcstudio?tab=tags 
+
+-------------------------------
+then, wherever the local Galaxy server is:
+
+(base) heiland@yoga:~/git/galaxy_rel_26.0$ ty Readme.rwh 
+
+(base) heiland@yoga:~/git/galaxy_rel_26.0$ vi ./tools/interactive/interactivetool_pcstudio.xml
+
+
+
+(base) heiland@yoga:~/git/galaxy_rel_26.0/tools$ grep version interactivetool_pcstudio.xml
+<tool id="interactive_tool_pcstudio" tool_type="interactive" name="PhysiCell Studio" version="@VERSION@" p
+rofile="22.05">
+(base) heiland@yoga:~/git/galaxy_rel_26.0/tools$ head interactivetool_pcstudio.xml
+<tool id="interactive_tool_pcstudio" tool_type="interactive" name="PhysiCell Studio" version="@VERSION@" p
+rofile="22.05">
+    <description>Interactive tool to create, simulate, and visualize a multicellular model using PhysiCell
+</description>
+    <macros>
+        <token name="@VERSION@">0.12</token>  <-------------- update to latest on quay
+-------------------------------
+
