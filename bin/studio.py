@@ -55,6 +55,8 @@ from settings import StudioSettings
 
 from galaxy_functions import save_project_galaxy_ui, load_project_galaxy_history, \
     get_galaxy_history, download_config_galaxy, download_zipped_csv_galaxy, download_all_zipped_galaxy
+from python_shell import open_python_shell
+from project_io import ProjectIO
 try:
     from galaxy_ie_helpers import put, find_matching_history_ids, get
 except:
@@ -172,6 +174,8 @@ class PhysiCellXMLCreator(QWidget):
                 msgBox.setText(f'Unable to create the physiboss_models.Database(). It requires being online.')
                 msgBox.setStandardButtons(QMessageBox.Ok)
                 returnValue = msgBox.exec()
+
+        self.project_io = ProjectIO(self)
 
         # Menus
         vlayout = QVBoxLayout(self)
@@ -546,6 +550,10 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
                 file_menu.addAction("Load project", lambda: load_project_galaxy_history(self))
 
             #------
+            file_menu.addSeparator()
+            file_menu.addAction("Export project", self.project_io.export_project)
+            file_menu.addAction("Import project", self.project_io.import_project)
+
             if self.samples_flag:
                 self.sample_models_menu = file_menu.addMenu("Load sample")
                 self.sample_models_menu.addAction("zombies & villagers", self.load_zombies_villagers_cb)
@@ -586,7 +594,12 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
             guide_act = help_menu.addAction("User Guide (link)", self.open_help_url)
             issues_act = help_menu.addAction("Create Issue (link)", self.create_issue_url)
 
+        QShortcut(QtGui.QKeySequence('Ctrl+Shift+P'), self, self.open_python_shell_cb)
+
         menubar.adjustSize()  # Argh. Otherwise, only 1st menu appears, with ">>" to others!
+
+    def open_python_shell_cb(self):
+        self._python_shell = open_python_shell(parent=self, local_vars={'studio': self})
 
     def open_help_url(self):
         url = QtCore.QUrl('https://github.com/PhysiCell-Tools/Studio-Guide/blob/main/README.md')
