@@ -23,7 +23,8 @@ class StudioSettings(QWidget):
         self.fixed_plot_flag = True
         self.vis_tab = vis_tab
 
-        self.pat_id = None
+        self.file_id = None
+        self.github_pat = None
 
         stylesheet = """ 
             QPushButton{ border: 1px solid; border-color: rgb(145, 200, 145); border-radius: 1px;  background-color: lightgreen; color: black; width: 64px; padding-right: 8px; padding-left: 8px; padding-top: 3px; padding-bottom: 3px; } 
@@ -60,12 +61,12 @@ class StudioSettings(QWidget):
         self.get_github_PAT_button.clicked.connect(self.github_PAT_cb)
         glayout.addWidget(self.get_github_PAT_button, idx_row, 0, 1, 2)
 
-        self.pat_id_w = QLineEdit("0")
-        self.pat_id_w.setEnabled(True)
-        self.pat_id_w.setFixedWidth(70)
-        self.pat_id_w.setValidator(QIntValidator())
-        self.pat_id_w.textChanged.connect(self.PAT_id_changed)
-        glayout.addWidget(self.pat_id_w, idx_row, 2, 1, 1)
+        self.file_id_w = QLineEdit("0")
+        self.file_id_w.setEnabled(True)
+        self.file_id_w.setFixedWidth(70)
+        self.file_id_w.setValidator(QIntValidator())
+        self.file_id_w.textChanged.connect(self.file_id_changed)
+        glayout.addWidget(self.file_id_w, idx_row, 2, 1, 1)
 
         self.vbox.addLayout(glayout)
 
@@ -115,27 +116,62 @@ class StudioSettings(QWidget):
                 self.vis_tab.plot_win.show()
             # self.vis_tab.plot_win.show()
 
-    def github_PAT_cb(self):
-        self.pat_id = int(self.pat_id_w.text())
-        try:
-            msgBox = QMessageBox()
-            msgBox.setText(f'Copying the requested data from the Galaxy History')
-            msgBox.setStandardButtons(QMessageBox.Ok)
-            returnValue = msgBox.exec()
-            # fid = find_matching_history_ids(self.pat_id)
-            # get(fid)
-            # if not self.xml_creator.fake_galaxy_flag:
-            get(self.pat_id)
-            # print("dummy get")
-        except:
-            print("Unable to get the file from History")
-            msgBox = QMessageBox()
-            msgBox.setText(f'load_file_cb: Unable to get file with History ID {self.pat_id}. Perhaps you got it previously.')
-            msgBox.setStandardButtons(QMessageBox.Ok)
-            returnValue = msgBox.exec()
 
-    def PAT_id_changed(self, sval):
+    def github_PAT_cb(self):
+        self.file_id = int(self.file_id_w.text())
+        # zip_file = "my_model.zip"
+        msgBox = QMessageBox()
+        from_filename = "/import/"
+
         try:
-            self.pat_id = int(sval)
+            msgBox.setText('Copying the requested data from the Galaxy History')
+            msgBox.setStandardButtons(QMessageBox.Ok)
+            msgBox.exec()
+
+            get(self.file_id)  # Galaxy I/O function
+
+            from_filename += str(self.file_id)
+            try:
+                print("reading PAT...")
+                with open(from_filename, "r", encoding="utf-8") as file:
+                    self.github_pat = file.read()
+                print(self.github_pat)
+
+                # print(f"load_project_cb(): attempting to copy {from_filename} to {zip_file}")
+                # shutil.copy(from_filename, zip_file)
+                # os.remove(from_filename)
+            except:
+                msg = f"Error: unable to read your GitHub personal access token."
+                print(msg)
+                msgBox.setText(msg)
+                msgBox.setStandardButtons(QMessageBox.Ok)
+                msgBox.exec()
+            # time.sleep(1)
+        except FileNotFoundError:
+            msg = f"Error: The file {from_file} was not found."
+            print(msg)
+            msgBox.setText(msg)
+            msgBox.setStandardButtons(QMessageBox.Ok)
+            msgBox.exec()
+        except Exception as e:
+            # msg = f'load_project_cb(): There was a problem getting or unzipping {from_filename} with History ID {self.file_id}.'
+            msg = traceback.format_exc()
+            self.show_error_message(msg)
+            # print(msg)
+            # msgBox.setText(msg)
+            # msgBox.setStandardButtons(QMessageBox.Ok)
+            # msgBox.exec()
+
+    def show_error_message(self, message):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setText(message)
+        msg.setWindowTitle("Error")
+        msg.setFixedWidth(500)
+        msg.exec_()
+
+    def file_id_changed(self, sval):
+        try:
+            self.file_id = int(sval)
         except:
             pass
