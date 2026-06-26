@@ -585,7 +585,12 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
             self.download_zipped_csv_item = self.download_menu.addAction("all_csv.zip", lambda: download_zipped_csv_galaxy(self))
             self.download_all_zipped_item = self.download_menu.addAction("all_output.zip", lambda: download_all_zipped_galaxy(self))
 
+            misc_menu.addSeparator()
+            misc_menu.addAction("Python shell", self.open_python_shell_cb)
+
         if not self.nanohub_flag and not self.galaxy_flag:
+            misc_menu = menubar.addMenu('&Misc')
+            misc_menu.addAction("Python shell", self.open_python_shell_cb)
             action_menu = menubar.addMenu('&Action')
             action_menu.addAction("Run", self.run_model_cb, QtGui.QKeySequence('Ctrl+r'))
 

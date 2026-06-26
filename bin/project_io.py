@@ -59,12 +59,14 @@ class ExportProjectWindow(QWidget):
         glayout.addWidget(QLabel("repo"), idx_row, 2, 1, 1)
 
         idx_row += 1
-        self.github_user_w = QLineEdit()
+        self.github_user_name = "user"
+        self.github_user_w = QLineEdit(self.github_user_name)
         # self.github_user_w.setFixedWidth(200)
         self.github_user_w.setEnabled(True)
         glayout.addWidget(self.github_user_w, idx_row, 1, 1, 1)
 
-        self.github_repo_w = QLineEdit()
+        self.github_repo_name = "repo"
+        self.github_repo_w = QLineEdit(self.github_repo_name)
         # self.github_user_w.setFixedWidth(200)
         self.github_repo_w.setEnabled(True)
         glayout.addWidget(self.github_repo_w, idx_row, 2, 1, 1)
@@ -86,10 +88,20 @@ class ExportProjectWindow(QWidget):
         self.vbox.addWidget(self.close_button)
         self.setLayout(self.vbox)
 
+    def show_info_message(self, message):
+        msgBox = QMessageBox()
+        msgBox.setIcon(QMessageBox.Information)
+        msgBox.setText(message)
+        msgBox.setStandardButtons(QMessageBox.Ok)
+        msgBox.exec_()
+
     def export_project_cb(self):
+        self.github_user_name = self.github_user_w.text()
+        self.github_repo_name = self.github_repo_w.text()
+
         fname = self.project_name_w.text()
         if self.timestamp_w.isChecked():
-            ts = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            ts = datetime.now().astimezone().strftime("%Y-%m-%d_%H-%M-%S")
             fname = f"{fname}_{ts}.zip"
         else:
             fname = f"{fname}.zip"
@@ -102,6 +114,8 @@ class ExportProjectWindow(QWidget):
         if msgBox.exec() == QMessageBox.Cancel:
             return
 
+        # self.show_info_message(f"export_project_cb(): zipping proj into {fname}")
+        self.show_info_message(f"zipping project into {fname}")
         file_str = os.path.join(os.getcwd(), "config/*.csv")
         # print('-------- export_project_cb(): zip up all', file_str)
         try:
@@ -114,11 +128,18 @@ class ExportProjectWindow(QWidget):
             # put(fname)
             # self.upload_binary_file(repo_name, local_path, github_path, commit_message, branch_name)
             # repo_name = self.github_user_w.text() + "/" + self.github_repo_w.text()
-            repo_name = os.path.join(self.github_user_w.text(), self.github_repo_w.text())
+            repo_name = os.path.join(self.github_user_name, self.github_repo_name)
+            # self.show_info_message(f"repo_name is {repo_name}")
 
-            print("repo_name= ",repo_name)
-            pat = None
-            self.upload_binary_file(pat, repo_name, fname, fname, "update project", "main")
+            # print("repo_name= ",repo_name)
+            github_pat_str = self.xml_creator.project_io.github_pat # token (PAT)
+            if github_pat_str is None:
+                # pass
+                self.show_error_message("github_pat_str is None")
+            else:
+                github_pat_str = github_pat_str.rstrip("\r\n")
+            # self.show_info_message(f"github_pat_str is {github_pat_str}. Calling upload_binary_file: repo={repo_name}, fname={fname}")
+            self.upload_binary_file(github_pat_str, repo_name, fname, fname, "update project", "main")
         except KeyError:
             msg = traceback.format_exc()
             self.show_error_message(msg)
@@ -126,8 +147,12 @@ class ExportProjectWindow(QWidget):
 
     def upload_binary_file(self, pa_token, repo_name, local_path, github_path, commit_message, branch_name):
         """Upload a binary file to a GitHub repository using a GitHub personal access token"""
-        g = Github(pa_token)
-        repo = g.get_repo(repo_name)
+        try:
+            g = Github(pa_token)
+            repo = g.get_repo(repo_name)
+        except Exception:
+            self.show_error_message(f"Error connecting to {repo_name}")
+            return
 
         with open(local_path, 'rb') as f:
             encoded_content = base64.b64encode(f.read()).decode("utf-8")
@@ -163,8 +188,19 @@ class ExportProjectWindow(QWidget):
 class ProjectIO:
     def __init__(self, studio):
         self.studio = studio
-        self.github_pa_token = None
         self.zip_basename = "my_project"
+        self.export_project_UI = None
+
+    @property
+    def github_pat(self):
+        settings = getattr(self.studio, 'studio_settings', None)
+        return settings.github_pat if settings is not None else None
+
+    @github_pat.setter
+    def github_pat(self, value):
+        settings = getattr(self.studio, 'studio_settings', None)
+        if settings is not None:
+            settings.github_pat = value
 
     def export_project(self):
         """Zip config/, custom_modules/, and root project files to a user-chosen .zip."""
@@ -263,10 +299,11 @@ class ProjectIO:
 
 
     def export_project_github_ui(self):
-        self.export_project_UI = ExportProjectWindow()
-        self.export_project_UI.xml_creator = self.studio
-        self.export_project_UI.hide()
+        if self.export_project_UI is None:
+            self.export_project_UI = ExportProjectWindow()
+            self.export_project_UI.xml_creator = self.studio
         self.export_project_UI.show()
+        self.export_project_UI.raise_()
 
 
     # def import_project_github_history(self):

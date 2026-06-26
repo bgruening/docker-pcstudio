@@ -3,7 +3,7 @@
 from studio_classes import QCheckBox_custom
 from PyQt5 import QtCore  #, QtGui
 from PyQt5.QtWidgets import (
-    QWidget, QScrollArea, QVBoxLayout, QGridLayout,
+    QFrame, QWidget, QScrollArea, QVBoxLayout, QGridLayout,
     QLineEdit, QPushButton, QMessageBox,
 )
 from PyQt5.QtGui import QIntValidator
@@ -13,6 +13,12 @@ try:
 except:
     print("----- cannot import from galaxy_ie_helpers ")
     pass
+
+class QHLine(QFrame):
+    def __init__(self):
+        super(QHLine, self).__init__()
+        self.setFrameShape(QFrame.HLine)
+        self.setFrameShadow(QFrame.Sunken)
 
 class StudioSettings(QWidget):
     def __init__(self, gui_w, min_size_flag, vis_tab):   # use dict eventually
@@ -40,11 +46,11 @@ class StudioSettings(QWidget):
 
         #------------
         idx_row = 0
-        self.min_size_checkbox = QCheckBox_custom('min size (1100x790)')
+        self.min_size_checkbox = QCheckBox_custom('Studio min size (1100x790)')
         self.min_size_checkbox.setChecked(self.min_size)
         self.min_size_checkbox.clicked.connect(self.toggle_min_size_cb)
-        idx_row += 1
-        glayout.addWidget(self.min_size_checkbox, idx_row,0,1,2) # w, row, column, rowspan, colspan
+        # idx_row += 1
+        glayout.addWidget(self.min_size_checkbox, idx_row,0,1,3) # w, row, column, rowspan, colspan
 
         #  future possibility of a floating Plot window
         # self.fixed_plot_checkbox = QCheckBox_custom('Fixed Plot window')
@@ -52,6 +58,10 @@ class StudioSettings(QWidget):
         # self.fixed_plot_checkbox.clicked.connect(self.toggle_fixed_plot_cb)
         # idx_row += 1
         # glayout.addWidget(self.fixed_plot_checkbox, idx_row,0,1,2) # w, row, column, rowspan, colspan
+
+
+        idx_row += 1
+        glayout.addWidget(QHLine(), idx_row,0,1,3) # w, row, column, rowspan, colspan
 
         idx_row += 1
         self.get_github_PAT_button = QPushButton("get GitHub PAT: History ID=")
