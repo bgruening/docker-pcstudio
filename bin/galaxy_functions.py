@@ -223,6 +223,7 @@ class LoadProjectWindow(QWidget):
             time.sleep(1)
             self.xml_creator.config_file = "config/PhysiCell_settings.xml"
             self.xml_creator.show_sample_model()
+
         except FileNotFoundError:
             msg = f"Error: The file {zip_file} was not found."
             print(msg)

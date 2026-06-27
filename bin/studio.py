@@ -555,6 +555,7 @@ PhysiCell Studio is provided "AS IS" without warranty of any kind. &nbsp; In no 
             file_menu.addAction("Import project", self.project_io.import_project)
 
             if self.samples_flag:
+                file_menu.addSeparator()
                 self.sample_models_menu = file_menu.addMenu("Load sample")
                 self.sample_models_menu.addAction("zombies & villagers", self.load_zombies_villagers_cb)
                 self.sample_models_menu.addAction("cancer,immune,drug", self.load_cancer_immune_drug_cb)
