@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIntValidator
 # from vis_tab import MainPlotWindow   # later maybe
 try:
-    from galaxy_ie_helpers import put, find_matching_history_ids, get
+    import galaxy_ie_helpers as gh
 except:
     print("----- cannot import from galaxy_ie_helpers ")
     pass
@@ -138,7 +138,13 @@ class StudioSettings(QWidget):
             msgBox.setStandardButtons(QMessageBox.Ok)
             msgBox.exec()
 
-            get(self.file_id)  # Galaxy I/O function
+            try:
+                path = gh.get(self.file_id)  # Galaxy I/O function
+                if path and os.path.exists(path):
+                    pass
+                else:
+                    self.show_error_message("Error retrieving data from History. Confirm the ID exists.")
+                    return
 
             from_filename += str(self.file_id)
             try:
