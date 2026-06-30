@@ -139,7 +139,8 @@ class ExportProjectWindow(QWidget):
             github_pat_str = self.xml_creator.project_io.github_pat # token (PAT)
             if github_pat_str is None:
                 # pass
-                self.show_error_message("github_pat_str is None")
+                # self.show_error_message("github_pat_str is None")
+                self.show_error_message("Your GitHub Personal Access Token is unknown.\nUse the Studio->Settings to provide it as a History ID datastore.")
             else:
                 github_pat_str = github_pat_str.rstrip("\r\n")
             # self.show_info_message(f"github_pat_str is {github_pat_str}. Calling upload_binary_file: repo={repo_name}, fname={fname}")
