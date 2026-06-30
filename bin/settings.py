@@ -1,5 +1,6 @@
 # from PyQt5 import QtCore
 # from PyQt5.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QGridLayout, QPushButton
+import traceback
 from studio_classes import QCheckBox_custom
 from PyQt5 import QtCore  #, QtGui
 from PyQt5.QtWidgets import (
@@ -138,13 +139,13 @@ class StudioSettings(QWidget):
             msgBox.setStandardButtons(QMessageBox.Ok)
             msgBox.exec()
 
-            try:
-                path = gh.get(self.file_id)  # Galaxy I/O function
-                if path and os.path.exists(path):
-                    pass
-                else:
-                    self.show_error_message("Error retrieving data from History. Confirm the ID exists.")
-                    return
+            # path = gh.get(self.file_id)  # Galaxy I/O function
+            gh.get(self.file_id)  # Galaxy I/O function
+            # if path and os.path.exists(path):
+                # pass
+            # else:
+                # self.show_error_message("Error retrieving data from History. Confirm the ID exists.")
+                # return
 
             from_filename += str(self.file_id)
             try:
@@ -162,9 +163,10 @@ class StudioSettings(QWidget):
                 msgBox.setText(msg)
                 msgBox.setStandardButtons(QMessageBox.Ok)
                 msgBox.exec()
+                return
             # time.sleep(1)
         except FileNotFoundError:
-            msg = f"Error: The file {from_file} was not found."
+            msg = f"Error: The file {from_filename} was not found."
             print(msg)
             msgBox.setText(msg)
             msgBox.setStandardButtons(QMessageBox.Ok)
